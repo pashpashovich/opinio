@@ -7,20 +7,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Entity
-@Table(name = "organizations")
+@Table(name = "abstract_users")
 @DiscriminatorValue("ORGANIZATION")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Organization extends AbstractUser {
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String name;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
