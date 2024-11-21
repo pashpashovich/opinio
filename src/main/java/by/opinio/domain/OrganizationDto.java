@@ -1,7 +1,5 @@
 package by.opinio.domain;
 
-import by.opinio.entity.Bonus;
-import by.opinio.entity.Poll;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
