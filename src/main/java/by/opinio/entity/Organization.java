@@ -7,7 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.List;
 @DiscriminatorValue("ORGANIZATION")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @SuperBuilder
 public class Organization extends AbstractUser {
 
