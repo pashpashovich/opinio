@@ -1,11 +1,16 @@
 package by.opinio.domain;
 
+import by.opinio.entity.Bonus;
+import by.opinio.entity.Category;
+import by.opinio.entity.Organization;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -13,9 +18,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class PollDto {
-    private UUID id; // Уникальный идентификатор опроса
-    private String title; // Название опроса
-    private String description; // Описание опроса
-    private LocalDateTime createdAt; // Время создания опроса
-    private LocalDateTime updatedAt; // Время последнего обновления опроса
+    private UUID id;
+    private String title;
+    private String description;
+    private Category category;
+    private Organization createdBy;
+    private List<Bonus> bonuses;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
+

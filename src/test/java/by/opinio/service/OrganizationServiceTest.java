@@ -59,6 +59,7 @@ class OrganizationServiceTest {
                                 .description("Survey description")
                                 .createdAt(LocalDateTime.now())
                                 .updatedAt(LocalDateTime.now())
+                                .createdBy(new Organization())
                                 .build()
                 ))
                 .build();

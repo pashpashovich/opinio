@@ -48,9 +48,9 @@ public class OrganizationService {
                                 .description(poll.getDescription())
                                 .createdAt(poll.getCreatedAt())
                                 .updatedAt(poll.getUpdatedAt())
+                                .createdBy(organization) // Добавляем ID организации
                                 .build())
                         .toList())
                 .build();
     }
-
 }
