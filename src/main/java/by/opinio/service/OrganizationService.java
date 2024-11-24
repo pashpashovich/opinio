@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class OrganizationService {
                                 .description(poll.getDescription())
                                 .createdAt(poll.getCreatedAt())
                                 .updatedAt(poll.getUpdatedAt())
-                                .createdBy(organization) // Добавляем ID организации
+                                .createdBy(organization)
                                 .build())
                         .toList())
                 .build();
@@ -93,8 +94,8 @@ public class OrganizationService {
         }
 
 
-        return organizationRepository.findByCategoriesIn(Collections.singleton(interestedCategories)).stream()
-                .map(this::convertToDto) 
+        return organizationRepository.findByCategoriesIn(interestedCategories).stream()
+                .map(this::convertToDto)
                 .toList();
     }
 
@@ -151,7 +152,7 @@ public class OrganizationService {
         }
 
         List<Category> interestedCategories = actualUser.getInterestedCategories();
-        return organizationRepository.findByCategoriesIn(Collections.singleton(interestedCategories)).stream()
+        return organizationRepository.findByCategoriesIn(interestedCategories).stream()
                 .map(this::convertToDto)
                 .toList();
     }
