@@ -6,11 +6,16 @@ import by.opinio.domain.OrganizationDto;
 import by.opinio.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +35,7 @@ public class OrganizationController {
         OrganizationDto organizationDto = organizationService.getOrganizationInfo(id);
         return ResponseEntity.ok(organizationDto);
     }
+
     /*
     Метод для получения организаций
     по категориям
