@@ -12,6 +12,7 @@ import by.opinio.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -62,5 +63,29 @@ public class PostCommentService {
                 comment.getContent(),
                 comment.getCreatedAt(),
                 user.getUsername());
+    }
+
+    public List<PostCommentDto> getCommentsByPost(UUID postId) {
+        return postCommentRepository.findByPostId(postId).stream()
+                .map(comment -> new PostCommentDto(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getCreatedAt(),
+                        comment.getUser().getUsername()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+    public void deleteComment(UUID commentId, UUID userId) throws AccessDeniedException {
+        PostComment comment = postCommentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("You do not have permission to delete this comment");
+        }
+        OrganizationPost post = comment.getPost();
+        post.setCommentCount(post.getCommentCount() - 1);
+        organizationPostRepository.save(post);
+        postCommentRepository.delete(comment);
     }
 }

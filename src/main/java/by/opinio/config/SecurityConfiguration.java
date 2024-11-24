@@ -67,6 +67,9 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "/api/posts/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/posts/organization/*").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/posts/*").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/comments/*").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/comments").hasAuthority("USER")
+                .requestMatchers(HttpMethod.DELETE, "/api/comments/*").hasAuthority("USER")
                 .anyRequest().authenticated());
         return http.build();
     }
