@@ -91,8 +91,8 @@ public class OrganizationService {
             throw new IllegalStateException("User has no interested categories");
         }
 
-
         return organizationRepository.findByCategoriesIn(interestedCategories).stream()
+
                 .map(this::convertToDto)
                 .toList();
     }

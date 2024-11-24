@@ -23,7 +23,7 @@ public class PollDto {
     private String description;
     private Category category;
     private Organization createdBy;
-    private List<Bonus> bonuses;
+    private Bonus bonuses;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

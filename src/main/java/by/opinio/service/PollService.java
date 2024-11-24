@@ -40,7 +40,6 @@ public class PollService {
                 .description(pollDto.getDescription())
                 .category(category)
                 .createdBy(createdBy)
-                .bonuses(pollDto.getBonuses())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -60,7 +59,6 @@ public class PollService {
         poll.setTitle(pollDto.getTitle());
         poll.setDescription(pollDto.getDescription());
         poll.setCategory(pollDto.getCategory());
-        poll.setBonuses(pollDto.getBonuses());
         poll.setUpdatedAt(LocalDateTime.now());
 
         pollRepository.save(poll);
@@ -77,7 +75,6 @@ public class PollService {
                         .description(poll.getDescription())
                         .category(poll.getCategory())
                         .createdBy(poll.getCreatedBy())
-                        .bonuses(poll.getBonuses())
                         .createdAt(poll.getCreatedAt())
                         .updatedAt(poll.getUpdatedAt())
                         .build())
@@ -100,7 +97,6 @@ public class PollService {
                         .description(poll.getDescription())
                         .category(poll.getCategory())
                         .createdBy(poll.getCreatedBy())
-                        .bonuses(poll.getBonuses())
                         .createdAt(poll.getCreatedAt())
                         .updatedAt(poll.getUpdatedAt())
                         .build())

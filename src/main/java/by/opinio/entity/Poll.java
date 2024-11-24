@@ -45,9 +45,6 @@ public class Poll {
     @JoinColumn(name = "created_by")
     private Organization createdBy;
 
-    @ManyToMany(mappedBy = "polls")
-    private List<Bonus> bonuses;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

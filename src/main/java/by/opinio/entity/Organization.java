@@ -22,6 +22,20 @@ public class Organization extends AbstractUser {
     @Column(unique = true)
     private String name;
 
+    private String description;
+
+    @Column
+    private String mission;
+
+    @Column
+    private String email;
+
+    @Column
+    private String phone;
+
+    @Column
+    private String website;
+
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
     private List<Bonus> bonuses;
 
@@ -39,7 +53,6 @@ public class Organization extends AbstractUser {
     @ManyToMany(mappedBy = "likedOrganizations")
     private List<User> likedByUsers;
 
-    private String description;
 
 }
 
