@@ -61,12 +61,28 @@ public class OrganizationService {
                 .build();
     }
 
-    public List<OrganizationDto> getOrganizationsByCategories(List<String> categoryNames) {
-        List<Category> categories = categoryRepository.findByNameIn(categoryNames);
-        return organizationRepository.findByCategoriesIn(Collections.singleton(categories)).stream()
-                .map(this::convertToDto)
+    public List<OrganizationDto> getOrganizationsByUserCategories(UUID userId) {
+
+        AbstractUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+
+        if (!(user instanceof User actualUser)) {
+            throw new IllegalArgumentException("Provided ID does not belong to a user");
+        }
+
+
+        List<Category> interestedCategories = actualUser.getInterestedCategories();
+        if (interestedCategories == null || interestedCategories.isEmpty()) {
+            throw new IllegalStateException("User has no interested categories");
+        }
+
+
+        return organizationRepository.findByCategoriesIn(Collections.singleton(interestedCategories)).stream()
+                .map(this::convertToDto) 
                 .toList();
     }
+
 
     public List<OrganizationDto> getLikedOrganizations(UUID userId) {
         AbstractUser user = userRepository.findById(userId)

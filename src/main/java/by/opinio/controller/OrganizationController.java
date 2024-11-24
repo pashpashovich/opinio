@@ -27,10 +27,11 @@ public class OrganizationController {
     по категориям
      */
     @GetMapping("/categories")
-    public ResponseEntity<List<OrganizationDto>> getOrganizationsByCategories(@RequestParam List<String> categories) {
-        List<OrganizationDto> organizations = organizationService.getOrganizationsByCategories(categories);
+    public ResponseEntity<List<OrganizationDto>> getOrganizationsByUserCategories(@RequestParam UUID userId) {
+        List<OrganizationDto> organizations = organizationService.getOrganizationsByUserCategories(userId);
         return ResponseEntity.ok(organizations);
     }
+
 
     /*
         Метод для получения организаций,
