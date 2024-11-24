@@ -79,7 +79,7 @@ public class OrganizationService {
 
 
         return organizationRepository.findByCategoriesIn(Collections.singleton(interestedCategories)).stream()
-                .map(this::convertToDto) 
+                .map(this::convertToDto)
                 .toList();
     }
 

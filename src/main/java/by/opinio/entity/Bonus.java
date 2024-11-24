@@ -28,7 +28,6 @@ import java.util.UUID;
 @Setter
 @Builder
 public class Bonus {
-
     @Id
     @GeneratedValue
     private UUID id;
@@ -43,13 +42,9 @@ public class Bonus {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
-    @ManyToMany
-    @JoinTable(
-            name = "bonus_polls",
-            joinColumns = @JoinColumn(name = "bonus_id"),
-            inverseJoinColumns = @JoinColumn(name = "poll_id")
-    )
-    private List<Poll> polls;
+    @ManyToOne
+    @JoinColumn(name = "poll_id", nullable = true)
+    private Poll poll;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

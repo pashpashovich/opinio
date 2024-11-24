@@ -31,8 +31,6 @@ public class OrganizationController {
         List<OrganizationDto> organizations = organizationService.getOrganizationsByUserCategories(userId);
         return ResponseEntity.ok(organizations);
     }
-
-
     /*
         Метод для получения организаций,
         которые понравились, если таких нет, ничего не возращаем
@@ -45,7 +43,7 @@ public class OrganizationController {
     /*
           Метод для получения организаций, которые могут понравится
           по категориям, если пользователь голый, то возращаем категории
-      */
+    */
     @GetMapping("/interests")
     public ResponseEntity<?> getOrganizationsByInterests(@RequestParam UUID userId) {
         List<OrganizationDto> organizations = organizationService.getOrganizationsByUserInterests(userId);

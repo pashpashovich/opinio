@@ -14,6 +14,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @SuperBuilder
 public abstract class AbstractUser implements UserDetails {
 
@@ -51,17 +53,15 @@ public abstract class AbstractUser implements UserDetails {
     @Column(name = "activity_type")
     private ActivityType activityType;
 
+    @Column(name = "address", nullable = true)
+    private String address;
+
+    @Column(name = "profile_picture_url", nullable = true)
+    private String profilePictureUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
-    }
-    public UUID getId() {
-        return id;
-    }
-
-    public Role getRole() {
-        return role;
     }
 
     @Override
@@ -93,5 +93,4 @@ public abstract class AbstractUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }
