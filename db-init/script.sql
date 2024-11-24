@@ -143,3 +143,25 @@ ALTER TABLE public.organizations
 ALTER TABLE public.abstract_users
     ADD COLUMN address character varying(255),
     ADD COLUMN profile_picture_url character varying(255);
+
+CREATE TABLE IF NOT EXISTS public.organization_posts (
+                                                         id uuid PRIMARY KEY NOT NULL,
+                                                         title character varying(255) NOT NULL,
+    content text NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    organization_id uuid NOT NULL,
+    FOREIGN KEY (organization_id) REFERENCES public.organizations (id) ON DELETE CASCADE
+    );
+
+CREATE TABLE IF NOT EXISTS public.post_comments (
+                                                    id uuid PRIMARY KEY NOT NULL,
+                                                    content text NOT NULL,
+                                                    created_at timestamp(6) without time zone NOT NULL,
+    user_id uuid NOT NULL,
+    post_id uuid NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES public.abstract_users (id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES public.organization_posts (id) ON DELETE CASCADE
+    );
+
+ALTER TABLE public.organization_posts
+    ADD COLUMN comment_count integer DEFAULT 0;

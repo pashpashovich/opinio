@@ -53,12 +53,6 @@ public abstract class AbstractUser implements UserDetails {
     @Column(name = "activity_type")
     private ActivityType activityType;
 
-    @Column(name = "address", nullable = true)
-    private String address;
-
-    @Column(name = "profile_picture_url", nullable = true)
-    private String profilePictureUrl;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

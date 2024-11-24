@@ -62,6 +62,11 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/auth/sign-up-org").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/sign-up-user").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/actuator/mappings").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/posts").hasAuthority("ORGANIZATION")
+                .requestMatchers(HttpMethod.DELETE, "/api/posts/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/posts/organization/*").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/posts/*").authenticated()
                 .anyRequest().authenticated());
         return http.build();
     }
@@ -75,9 +80,9 @@ public class SecurityConfiguration {
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
                     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.setContentType("application/json" );
+                    response.setContentType("application/json");
                     try {
-                        response.getWriter().write("{\"error\": \"Неверный логин или пароль\"}" );
+                        response.getWriter().write("{\"error\": \"Неверный логин или пароль\"}");
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }

@@ -190,4 +190,5 @@ public class OrganizationService {
         }
         throw new IllegalArgumentException("Provided ID does not belong to a valid user");
     }
+
 }
