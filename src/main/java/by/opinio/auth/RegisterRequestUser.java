@@ -18,5 +18,6 @@ public class RegisterRequestUser {
     private ActivityType activityType;
     private String activityName;
     private LocalDate dateOfBirth;
+    private String[] tags;
 
 }

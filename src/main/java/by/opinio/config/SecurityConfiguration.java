@@ -61,6 +61,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/auth/authenticate").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/sign-up-org").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/sign-up-user").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated());
         return http.build();
     }
