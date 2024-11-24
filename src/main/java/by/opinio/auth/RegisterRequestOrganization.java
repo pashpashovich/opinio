@@ -14,6 +14,11 @@ public class RegisterRequestOrganization {
     private String login;
     private String password;
     private String name;
+    private String mission;
+    private String description;
+    private String email;
+    private String phone;
+    private String website;
     private ActivityType activityType;
     private String[] tags;
 }

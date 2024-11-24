@@ -19,21 +19,22 @@ import java.util.List;
 @SuperBuilder
 public class Organization extends AbstractUser {
 
-    @Column(unique = true)
+    @Column(name = "name",unique = true)
     private String name;
 
+    @Column(name = "description")
     private String description;
 
-    @Column
+    @Column(name = "mission")
     private String mission;
 
-    @Column
+    @Column(name = "email")
     private String email;
 
-    @Column
+    @Column(name = "phone")
     private String phone;
 
-    @Column
+    @Column(name = "website")
     private String website;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)

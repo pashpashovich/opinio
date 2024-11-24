@@ -49,8 +49,13 @@ public class AuthenticationService {
                 .username(request.getLogin())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.ORGANIZATION)
-                .activityType(request.getActivityType())
                 .name(request.getName())
+                .activityType(request.getActivityType())
+                .mission(request.getMission())
+                .description(request.getDescription())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .website(request.getWebsite())
                 .build();
 
         userService.save(organization);

@@ -1,10 +1,12 @@
 package by.opinio.service;
 
 import by.opinio.entity.AbstractUser;
+import by.opinio.entity.User;
 import by.opinio.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,4 +34,10 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll().stream()
+                .filter(abstractUser -> abstractUser instanceof User user)
+                .map(abstractUser -> (User)abstractUser)
+                .toList();
+    }
 }
