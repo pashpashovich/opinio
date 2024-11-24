@@ -42,9 +42,9 @@ public class Bonus {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
-    @ManyToOne
-    @JoinColumn(name = "poll_id", nullable = true)
-    private Poll poll;
+    @ManyToMany(mappedBy = "bonuses")
+    private List<Poll> polls;
+
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

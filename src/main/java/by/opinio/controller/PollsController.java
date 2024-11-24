@@ -1,6 +1,7 @@
 package by.opinio.controller;
 
 import by.opinio.domain.PollDto;
+import by.opinio.domain.QuestionDto;
 import by.opinio.entity.Question;
 import by.opinio.service.PollService;
 import lombok.RequiredArgsConstructor;
@@ -26,44 +27,31 @@ public class PollsController {
 
     private final PollService pollService;
 
+    /**
+     * Создание нового опроса.
+     */
     @PostMapping
-    public ResponseEntity<String> createPoll(@RequestBody PollDto pollDto) {
-        pollService.createPoll(pollDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Poll created successfully");
+    public ResponseEntity<PollDto> createPoll(@RequestBody PollDto pollDto) {
+        PollDto createdPoll = pollService.createPoll(pollDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPoll);
     }
 
+    /**
+     * Обновление существующего опроса.
+     */
     @PutMapping("/{pollId}")
-    public ResponseEntity<String> updatePoll(@PathVariable UUID pollId, @RequestBody PollDto pollDto) {
-        pollService.updatePoll(pollId, pollDto);
-        return ResponseEntity.ok("Poll updated successfully");
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PollDto>> getAllPolls() {
-        return ResponseEntity.ok(pollService.getAllPolls());
+    public ResponseEntity<PollDto> updatePoll(@PathVariable UUID pollId, @RequestBody PollDto pollDto) {
+        PollDto updatedPoll = pollService.updatePoll(pollId, pollDto);
+        return ResponseEntity.ok(updatedPoll);
     }
 
     /**
-     * Получение опросов по организации.
+     * Удаление опроса по ID.
      */
-    @GetMapping("/organization/{organizationId}")
-    public ResponseEntity<List<PollDto>> getPollsByOrganization(@PathVariable UUID organizationId) {
-        return ResponseEntity.ok(pollService.getPollsByOrganization(organizationId));
-    }
-    /**
-     * Получение опросов по нескольким категориям.
-     */
-    @GetMapping("/categories")
-    public ResponseEntity<List<PollDto>> getPollsByCategories(@RequestParam List<UUID> categoryIds) {
-        return ResponseEntity.ok(pollService.getPollsByCategories(categoryIds));
-    }
-
-    /**
-     * Получение вопросов по ID опроса.
-     */
-    @GetMapping("/{pollId}/questions")
-    public ResponseEntity<List<Question>> getQuestionsByPollId(@PathVariable UUID pollId) {
-        return ResponseEntity.ok(pollService.getQuestionsByPollId(pollId));
+    @DeleteMapping("/{pollId}")
+    public ResponseEntity<Void> deletePoll(@PathVariable UUID pollId) {
+        pollService.deletePoll(pollId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -71,24 +59,76 @@ public class PollsController {
      */
     @GetMapping("/{pollId}")
     public ResponseEntity<PollDto> getPollById(@PathVariable UUID pollId) {
-        return ResponseEntity.ok(pollService.getPollById(pollId));
+        PollDto poll = pollService.getPollById(pollId);
+        return ResponseEntity.ok(poll);
     }
 
     /**
-     * Удаление опроса по ID.
+     * Получение всех опросов.
      */
-    @DeleteMapping("/{pollId}")
-    public ResponseEntity<String> deletePoll(@PathVariable UUID pollId) {
-        pollService.deletePoll(pollId);
-        return ResponseEntity.ok("Poll deleted successfully");
+    @GetMapping
+    public ResponseEntity<List<PollDto>> getAllPolls() {
+        List<PollDto> polls = pollService.getAllPolls();
+        return ResponseEntity.ok(polls);
     }
+
     /**
-     * Получение опросов по категориям для определённой организации.
+     * Получение опросов для организации.
      */
-    @GetMapping("/organization/{organizationId}/categories")
+    @GetMapping("/organization/{organizationId}")
+    public ResponseEntity<List<PollDto>> getPollsByOrganization(@PathVariable UUID organizationId) {
+        List<PollDto> polls = pollService.getPollsByOrganization(organizationId);
+        return ResponseEntity.ok(polls);
+    }
+
+    /**
+     * Получение опросов по категориям.
+     */
+    @PostMapping("/categories")
+    public ResponseEntity<List<PollDto>> getPollsByCategories(@RequestBody List<UUID> categoryIds) {
+        List<PollDto> polls = pollService.getPollsByCategories(categoryIds);
+        return ResponseEntity.ok(polls);
+    }
+
+    /**
+     * Получение опросов по категориям и организации.
+     */
+    @PostMapping("/organization/{organizationId}/categories")
     public ResponseEntity<List<PollDto>> getPollsByOrganizationAndCategories(
             @PathVariable UUID organizationId,
-            @RequestParam List<UUID> categoryIds) {
-        return ResponseEntity.ok(pollService.getPollsByOrganizationAndCategories(organizationId, categoryIds));
+            @RequestBody List<UUID> categoryIds) {
+        List<PollDto> polls = pollService.getPollsByOrganizationAndCategories(organizationId, categoryIds);
+        return ResponseEntity.ok(polls);
+    }
+
+    /**
+     * Добавление вопросов к опросу.
+     */
+    @PostMapping("/{pollId}/questions")
+    public ResponseEntity<PollDto> addQuestionsToPoll(
+            @PathVariable UUID pollId,
+            @RequestBody List<QuestionDto> questionDtos) {
+        PollDto updatedPoll = pollService.addQuestionsToPoll(pollId, questionDtos);
+        return ResponseEntity.ok(updatedPoll);
+    }
+
+    /**
+     * Получение вопросов для опроса.
+     */
+    @GetMapping("/{pollId}/questions")
+    public ResponseEntity<List<QuestionDto>> getQuestionsByPollId(@PathVariable UUID pollId) {
+        List<QuestionDto> questions = pollService.getQuestionsByPollId(pollId);
+        return ResponseEntity.ok(questions);
+    }
+
+    /**
+     * Добавление бонусов к опросу.
+     */
+    @PostMapping("/{pollId}/bonuses")
+    public ResponseEntity<PollDto> addBonusesToPoll(
+            @PathVariable UUID pollId,
+            @RequestBody List<UUID> bonusIds) {
+        PollDto updatedPoll = pollService.addBonusesToPoll(pollId, bonusIds);
+        return ResponseEntity.ok(updatedPoll);
     }
 }
