@@ -52,7 +52,7 @@ public class OrganizationController {
     }
 
     @PostMapping("/liked")
-    public ResponseEntity<Void> addLikedOrganizations(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
+    public ResponseEntity<Void> addLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
         organizationService.addLikedOrganization(userId, request.getOrganizationId());
         return ResponseEntity.ok().build();
     }
@@ -71,5 +71,10 @@ public class OrganizationController {
         return ResponseEntity.ok(organizations);
     }
 
+    @PostMapping("/remove-liked")
+    public ResponseEntity<Void> removeLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
+        organizationService.removeLikedOrganization(userId, request.getOrganizationId());
+        return ResponseEntity.ok().build();
+    }
 
 }

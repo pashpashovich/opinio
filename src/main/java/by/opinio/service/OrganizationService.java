@@ -17,10 +17,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -112,6 +110,7 @@ public class OrganizationService {
                 .map(this::convertToDto)
                 .toList();
     }
+
     public void addLikedOrganization(UUID userId, UUID organizationId) {
         AbstractUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -125,6 +124,7 @@ public class OrganizationService {
             userRepository.save(actualUser);
         }
     }
+
     public void removeLikedOrganization(UUID userId, UUID organizationId) {
         AbstractUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -133,11 +133,14 @@ public class OrganizationService {
                 .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
 
         User actualUser = extractUser(user);
-        if (!actualUser.getLikedOrganizations().contains(organization)) {
-            actualUser.getLikedOrganizations().add(organization);
+        if (actualUser.getLikedOrganizations().contains(organization)) {
+            actualUser.getLikedOrganizations().remove(organization);
             userRepository.save(actualUser);
+        } else {
+            throw new IllegalArgumentException("Данная организация не была лайкнутой...");
         }
     }
+
     public List<OrganizationDto> getOrganizationsByUserInterests(UUID userId) {
 
         AbstractUser user = userRepository.findById(userId)
@@ -173,6 +176,7 @@ public class OrganizationService {
                         .toList())
                 .build();
     }
+
     private CategoryDto convertCategoryToDto(Category category) {
         return CategoryDto.builder()
                 .id(category.getId())
