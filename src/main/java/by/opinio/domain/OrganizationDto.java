@@ -20,4 +20,5 @@ public class OrganizationDto {
     private String description;
     private List<BonusDto> bonuses;
     private List<PollDto> polls;
+    private List<CategoryDto> categories;
 }

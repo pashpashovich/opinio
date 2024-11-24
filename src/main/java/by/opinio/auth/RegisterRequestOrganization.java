@@ -14,4 +14,5 @@ public class RegisterRequestOrganization {
     private String login;
     private String password;
     private ActivityType activityType;
+    private String[] tags;
 }

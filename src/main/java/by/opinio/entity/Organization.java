@@ -1,11 +1,6 @@
 package by.opinio.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +27,17 @@ public class Organization extends AbstractUser {
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private List<Poll> polls;
+
+    @ManyToMany
+    @JoinTable(
+            name = "organization_categories",
+            joinColumns = @JoinColumn(name = "organization_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
+
+    @ManyToMany(mappedBy = "likedOrganizations")
+    private List<User> likedByUsers;
 
     private String description;
 

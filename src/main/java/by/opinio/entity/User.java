@@ -7,9 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -20,6 +18,8 @@ import java.util.List;
 @DiscriminatorValue("USER")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @SuperBuilder
 public class User extends AbstractUser {
     @Column(name = "activity_name")
@@ -35,4 +35,12 @@ public class User extends AbstractUser {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> interestedCategories;
+
+    @ManyToMany
+    @JoinTable(
+            name = "liked_organizations",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id")
+    )
+    private List<Organization> likedOrganizations;
 }

@@ -35,11 +35,17 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequestOrganization request) {
         if (userService.isLoginAvailable(request.getLogin())) {
+            List<Category> categories = Arrays.stream(request.getTags())
+                    .map(tag -> categoryRepository.findByName(tag)
+                            .orElseThrow(() -> new IllegalArgumentException("Category not found: " + tag)))
+                    .toList();
+
             Organization organization = Organization.builder()
                     .username(request.getLogin())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .role(Role.ORGANIZATION)
                     .activityType(request.getActivityType())
+                    .categories(categories)
                     .build();
             userService.save(organization);
             var jwtToken = jwtService.generateToken(organization);
