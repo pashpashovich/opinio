@@ -108,3 +108,20 @@ CREATE TABLE IF NOT EXISTS public.user_categories (
                                                       FOREIGN KEY (user_id) REFERENCES public.abstract_users (id)
                                                           MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+-- Создание таблицы связей пользователей и организаций которые ему нравки
+CREATE TABLE  IF NOT EXISTS public.liked_organizations (
+                                     user_id UUID NOT NULL,
+                                     organization_id UUID NOT NULL,
+                                     PRIMARY KEY (user_id, organization_id),
+                                     FOREIGN KEY (user_id) REFERENCES abstract_users (id) ON DELETE CASCADE,
+                                     FOREIGN KEY (organization_id) REFERENCES organizations (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.organization_categories (
+                                         organization_id UUID NOT NULL,
+                                         category_id UUID NOT NULL,
+                                         PRIMARY KEY (organization_id, category_id),
+                                         FOREIGN KEY (organization_id) REFERENCES organizations (id) ON DELETE CASCADE,
+                                         FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
+);
