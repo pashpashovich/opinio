@@ -4,8 +4,10 @@ import by.opinio.domain.PollDto;
 import by.opinio.entity.Category;
 import by.opinio.entity.Organization;
 import by.opinio.entity.Poll;
+import by.opinio.entity.Question;
 import by.opinio.repository.CategoryRepository;
 import by.opinio.repository.PollRepository;
+import by.opinio.repository.QuestionRepository;
 import by.opinio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class PollService {
     private final PollRepository pollRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final QuestionRepository questionRepository;
 
     /**
      * Создание нового опроса.
@@ -100,6 +103,77 @@ public class PollService {
                         .createdAt(poll.getCreatedAt())
                         .updatedAt(poll.getUpdatedAt())
                         .build())
+                .toList();
+    }
+    /**
+     * Получение опросов по нескольким категориям.
+     */
+    public List<PollDto> getPollsByCategories(List<UUID> categoryIds) {
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.isEmpty()) {
+            throw new IllegalArgumentException("No categories found for the given IDs");
+        }
+
+        return pollRepository.findByCategoryIn(categories).stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+    /**
+     * Получение вопросов по ID опроса.
+     */
+    public List<Question> getQuestionsByPollId(UUID pollId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+
+        return questionRepository.findByPoll(poll);
+    }
+
+    private PollDto convertToDto(Poll poll) {
+        return PollDto.builder()
+                .id(poll.getId())
+                .title(poll.getTitle())
+                .description(poll.getDescription())
+                .category(poll.getCategory())
+                .createdBy(poll.getCreatedBy())
+                .createdAt(poll.getCreatedAt())
+                .updatedAt(poll.getUpdatedAt())
+                .build();
+    }
+
+    /**
+     * Получение опроса по ID.
+     */
+    public PollDto getPollById(UUID pollId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+        return convertToDto(poll);
+    }
+    /**
+     * Удаление опроса по ID.
+     */
+    public void deletePoll(UUID pollId) {
+        if (!pollRepository.existsById(pollId)) {
+            throw new IllegalArgumentException("Poll not found");
+        }
+        pollRepository.deleteById(pollId);
+    }
+    /**
+     * Получение опросов по категориям для определённой организации.
+     */
+    public List<PollDto> getPollsByOrganizationAndCategories(UUID organizationId, List<UUID> categoryIds) {
+        // Получаем организацию
+        Organization organization = (Organization) userRepository.findById(organizationId)
+                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+
+        // Получаем категории
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.isEmpty()) {
+            throw new IllegalArgumentException("No categories found for the given IDs");
+        }
+
+        // Получаем опросы по категориям и организации
+        return pollRepository.findByCreatedByAndCategoryIn(organization, categories).stream()
+                .map(this::convertToDto)
                 .toList();
     }
 }
