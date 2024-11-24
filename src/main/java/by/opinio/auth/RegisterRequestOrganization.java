@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class RegisterRequestOrganization {
     private String login;
     private String password;
+    private String name;
     private ActivityType activityType;
     private String[] tags;
 }

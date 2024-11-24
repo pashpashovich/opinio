@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 @Entity
-@Table(name = "abstract_users")
+@Table(name = "organizations")
 @DiscriminatorValue("ORGANIZATION")
 @NoArgsConstructor
 @AllArgsConstructor

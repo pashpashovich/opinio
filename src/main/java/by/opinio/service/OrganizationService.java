@@ -13,6 +13,8 @@ import by.opinio.repository.OrganizationRepository;
 import by.opinio.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -26,6 +28,19 @@ public class OrganizationService {
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
     private final CategoryRepository categoryRepository;
+
+    public void save(Organization organization) {
+        try {
+            organizationRepository.save(organization);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("Failed to save organization: Integrity constraint violation", e);
+        } catch (JpaSystemException e) {
+            throw new IllegalStateException("Failed to save organization: JPA system error", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error while saving organization", e);
+        }
+    }
+
 
     public OrganizationDto getOrganizationInfo(UUID organizationId) {
         AbstractUser user = userRepository.findById(organizationId)
