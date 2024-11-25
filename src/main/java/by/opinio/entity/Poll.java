@@ -12,11 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +20,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "polls")
-@Data
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -4,6 +4,7 @@ import by.opinio.Exception.AppException;
 import by.opinio.domain.*;
 import by.opinio.entity.*;
 import by.opinio.repository.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class PollService {
     private final AnswerRepository answerRepository;
     private final PollResultRepository pollResultRepository;
     private final BonusAwardRepository bonusAwardRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Создание нового опроса.
@@ -336,32 +338,42 @@ public class PollService {
 
     @Transactional
     public void submitPollAnswers(PollResultDTO pollResult) {
-        // Сохранение результатов опроса
-        List<PollResult> pollResults = pollResult.getAnswers().stream()
-                .map(answer -> PollResult.builder()
-                        .id(UUID.randomUUID())
-                        .poll(Poll.builder().id(pollResult.getPollId()).build()) // Создание ссылки на Poll
-                        .user(User.builder().id(pollResult.getUserId()).build()) // Создание ссылки на User
-                        .answer(answer.toJson()) // Преобразование ответа в JSON
-                        .createdAt(LocalDateTime.now())
-                        .submittedAt(LocalDateTime.now())
-                        .build())
-                .toList();
+        // Сохраняем результаты ответов пользователя
+        for (PollResultAnswerDTO answer : pollResult.getAnswers()) {
+            String jsonAnswer;
+            try {
+                // Преобразуем ID ответа в JSON
+                jsonAnswer = objectMapper.writeValueAsString(answer.getAnswerId());
+            } catch (Exception e) {
+                throw new RuntimeException("Error converting answer to JSON", e);
+            }
 
-        pollResultRepository.saveAll(pollResults);
+            PollResult pollResultEntity = PollResult.builder()
+                    .id(UUID.randomUUID())
+                    .poll(Poll.builder().id(pollResult.getPollId()).build()) // Ссылка на опрос
+                    .user(User.builder().id(pollResult.getUserId()).build()) // Ссылка на пользователя
+                    .answer(jsonAnswer) // Ответ в формате JSON
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
-        // Присвоение бонуса, если он существует для этого опроса
-        bonusRepository.findByPollId(pollResult.getPollId()).ifPresent(bonus -> {
-            User user = User.builder().id(pollResult.getUserId()).build(); // Ссылка на пользователя
+            pollResultRepository.save(pollResultEntity);
+        }
+
+        // Присваиваем бонусы, связанные с опросом
+        Poll poll = pollRepository.findById(pollResult.getPollId())
+                .orElseThrow(() -> new RuntimeException("Poll not found with ID: " + pollResult.getPollId()));
+
+        List<Bonus> bonuses = poll.getBonuses(); // Получаем связанные бонусы
+        for (Bonus bonus : bonuses) {
             BonusAward bonusAward = BonusAward.builder()
                     .id(UUID.randomUUID())
-                    .user(user) // Передаём сущность User
-                    .bonus(bonus) // Передаём сущность Bonus
+                    .user(User.builder().id(pollResult.getUserId()).build()) // Ссылка на пользователя
+                    .bonus(bonus) // Ссылка на бонус
                     .awardedAt(LocalDateTime.now())
                     .build();
-            bonusAwardRepository.save(bonusAward);
-        });
 
+            bonusAwardRepository.save(bonusAward);
+        }
     }
 
 
