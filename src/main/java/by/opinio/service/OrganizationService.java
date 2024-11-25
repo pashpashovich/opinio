@@ -1,5 +1,6 @@
 package by.opinio.service;
 
+import by.opinio.Exception.AppException;
 import by.opinio.domain.BonusDto;
 import by.opinio.domain.CategoryDto;
 import by.opinio.domain.OrganizationDto;
@@ -14,6 +15,7 @@ import by.opinio.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
@@ -33,21 +35,21 @@ public class OrganizationService {
         try {
             organizationRepository.save(organization);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("Failed to save organization: Integrity constraint violation", e);
+            throw new AppException("Failed to save organization: Integrity constraint violation", HttpStatus.CONFLICT);
         } catch (JpaSystemException e) {
-            throw new IllegalStateException("Failed to save organization: JPA system error", e);
+            throw new AppException("Failed to save organization: JPA system error",HttpStatus.CONFLICT);
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected error while saving organization", e);
+            throw new AppException("Unexpected error while saving organization", HttpStatus.CONFLICT);
         }
     }
 
 
     public OrganizationDto getOrganizationInfo(UUID organizationId) {
         AbstractUser user = userRepository.findById(organizationId)
-                .orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         if (!(user instanceof Organization organization)) {
-            throw new IllegalArgumentException("The provided ID does not belong to an organization");
+            throw new AppException("The provided ID does not belong to an organization", HttpStatus.CONFLICT);
         }
 
         return OrganizationDto.builder()
@@ -75,17 +77,17 @@ public class OrganizationService {
     public List<OrganizationDto> getOrganizationsByUserCategories(UUID userId) {
 
         AbstractUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
 
         if (!(user instanceof User actualUser)) {
-            throw new IllegalArgumentException("Provided ID does not belong to a user");
+            throw new AppException("Provided ID does not belong to a user", HttpStatus.NOT_FOUND);
         }
 
 
         List<Category> interestedCategories = actualUser.getInterestedCategories();
         if (interestedCategories == null || interestedCategories.isEmpty()) {
-            throw new IllegalStateException("User has no interested categories");
+            throw new AppException("User has no interested categories", HttpStatus.CONFLICT);
         }
 
         return organizationRepository.findByCategoriesIn(interestedCategories).stream()
@@ -97,10 +99,10 @@ public class OrganizationService {
 
     public List<OrganizationDto> getLikedOrganizations(UUID userId) {
         AbstractUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (!(user instanceof User actualUser)) {
-            throw new IllegalArgumentException("Provided ID does not belong to a valid user");
+            throw new AppException("Provided ID does not belong to a valid user", HttpStatus.CONFLICT);
         }
 
         return actualUser.getLikedOrganizations().stream()
@@ -110,10 +112,10 @@ public class OrganizationService {
 
     public void addLikedOrganization(UUID userId, UUID organizationId) {
         AbstractUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         User actualUser = extractUser(user);
         if (!actualUser.getLikedOrganizations().contains(organization)) {
@@ -124,27 +126,27 @@ public class OrganizationService {
 
     public void removeLikedOrganization(UUID userId, UUID organizationId) {
         AbstractUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         User actualUser = extractUser(user);
         if (actualUser.getLikedOrganizations().contains(organization)) {
             actualUser.getLikedOrganizations().remove(organization);
             userRepository.save(actualUser);
         } else {
-            throw new IllegalArgumentException("Данная организация не была лайкнутой...");
+            throw new AppException("Данная организация не была лайкнутой...", HttpStatus.CONFLICT);
         }
     }
 
     public List<OrganizationDto> getOrganizationsByUserInterests(UUID userId) {
 
         AbstractUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
 
         if (!(user instanceof User actualUser)) {
-            throw new IllegalArgumentException("Provided ID does not belong to a valid user");
+            throw new AppException("Provided ID does not belong to a valid user", HttpStatus.NOT_FOUND);
         }
 
         if (actualUser.getInterestedCategories() == null || actualUser.getInterestedCategories().isEmpty()) {
@@ -200,7 +202,7 @@ public class OrganizationService {
         if (user instanceof User actualUser) {
             return actualUser;
         }
-        throw new IllegalArgumentException("Provided ID does not belong to a valid user");
+        throw new AppException("Provided ID does not belong to a valid user", HttpStatus.CONFLICT);
     }
 
 }

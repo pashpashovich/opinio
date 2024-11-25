@@ -1,16 +1,16 @@
 package by.opinio.service;
 
+import by.opinio.Exception.AppException;
 import by.opinio.domain.CreatePostDto;
 import by.opinio.domain.OrganizationPostDto;
 import by.opinio.entity.Organization;
 import by.opinio.entity.OrganizationPost;
 import by.opinio.repository.OrganizationPostRepository;
 import by.opinio.repository.OrganizationRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class OrganizationPostService {
 
     public List<OrganizationPostDto> getPostsByOrganization(UUID organizationId) {
         Organization organization = organizationRepository.findById(organizationId)
-                .orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found",HttpStatus.NOT_FOUND));
         return organizationPostRepository.findByOrganizationId(organizationId).stream()
                 .map(post -> new OrganizationPostDto(
                         post.getId(),
@@ -45,7 +45,7 @@ public class OrganizationPostService {
 
     public OrganizationPostDto getPostById(UUID postId) {
         OrganizationPost post = organizationPostRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+                .orElseThrow(() -> new AppException("Post not found", HttpStatus.NOT_FOUND));
         return new OrganizationPostDto(
                 post.getId(),
                 post.getTitle(),
@@ -57,7 +57,7 @@ public class OrganizationPostService {
 
     public OrganizationPostDto createPost(CreatePostDto createPostDto) {
         Organization organization = organizationRepository.findById(createPostDto.getOrganizationId())
-                .orElseThrow(() -> new EntityNotFoundException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         OrganizationPost post = new OrganizationPost();
         post.setTitle(createPostDto.getTitle());
@@ -76,11 +76,11 @@ public class OrganizationPostService {
                 post.getCommentCount());
     }
 
-    public void deletePost(UUID postId, UUID organizationId) throws AccessDeniedException {
+    public void deletePost(UUID postId, UUID organizationId)  {
         OrganizationPost post = organizationPostRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+                .orElseThrow(() -> new AppException("Post not found", HttpStatus.NOT_FOUND));
         if (!post.getOrganization().getId().equals(organizationId)) {
-            throw new AccessDeniedException("Organization does not have permission to delete this post");
+            throw new AppException("Organization does not have permission to delete this post", HttpStatus.CONFLICT);
         }
         organizationPostRepository.delete(post);
     }

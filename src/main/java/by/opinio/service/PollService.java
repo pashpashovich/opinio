@@ -1,8 +1,7 @@
 package by.opinio.service;
 
+import by.opinio.Exception.AppException;
 import by.opinio.domain.BonusDto;
-import by.opinio.domain.CategoryDto;
-import by.opinio.domain.OrganizationDto;
 import by.opinio.domain.PollDto;
 import by.opinio.domain.QuestionDto;
 import by.opinio.entity.Bonus;
@@ -16,6 +15,7 @@ import by.opinio.repository.PollRepository;
 import by.opinio.repository.QuestionRepository;
 import by.opinio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -39,11 +39,11 @@ public class PollService {
     public PollDto createPoll(PollDto pollDto) {
         // Получаем организацию, которая создаёт опрос
         Organization createdBy = (Organization) userRepository.findById(pollDto.getCreatedBy().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         // Получаем категорию, к которой относится опрос
         Category category = categoryRepository.findById(pollDto.getCategory().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new AppException("Category not found", HttpStatus.NOT_FOUND));
 
         // Создаём новый опрос
         Poll poll = Poll.builder()
@@ -67,7 +67,7 @@ public class PollService {
     public PollDto updatePoll(UUID pollId, PollDto pollDto) {
         // Получаем существующий опрос
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
 
         // Обновляем основные поля опроса
         poll.setTitle(pollDto.getTitle());
@@ -76,7 +76,7 @@ public class PollService {
         // Обновляем категорию, если указана
         if (pollDto.getCategory() != null && pollDto.getCategory().getId() != null) {
             Category category = categoryRepository.findById(pollDto.getCategory().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                    .orElseThrow(() -> new AppException("Category not found", HttpStatus.NOT_FOUND));
             poll.setCategory(category);
         }
 
@@ -101,7 +101,7 @@ public class PollService {
         if (pollDto.getBonuses() != null) {
             List<Bonus> updatedBonuses = pollDto.getBonuses().stream()
                     .map(bonusDto -> bonusRepository.findById(bonusDto.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Bonus not found")))
+                            .orElseThrow(() -> new AppException("Bonus not found", HttpStatus.NOT_FOUND)))
                     .toList();
             poll.setBonuses(updatedBonuses);
         }
@@ -120,7 +120,7 @@ public class PollService {
      */
     public void deletePoll(UUID pollId) {
         if (!pollRepository.existsById(pollId)) {
-            throw new IllegalArgumentException("Poll not found");
+            throw new AppException("Poll not found", HttpStatus.NOT_FOUND);
         }
         pollRepository.deleteById(pollId);
     }
@@ -130,7 +130,7 @@ public class PollService {
      */
     public PollDto getPollById(UUID pollId) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
         return convertToDto(poll);
     }
 
@@ -148,7 +148,7 @@ public class PollService {
      */
     public List<PollDto> getPollsByOrganization(UUID organizationId) {
         Organization organization = (Organization) userRepository.findById(organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         return pollRepository.findByCreatedBy(organization).stream()
                 .map(this::convertToDto)
@@ -161,7 +161,7 @@ public class PollService {
     public List<PollDto> getPollsByCategories(List<UUID> categoryIds) {
         List<Category> categories = categoryRepository.findAllById(categoryIds);
         if (categories.isEmpty()) {
-            throw new IllegalArgumentException("No categories found for the given IDs");
+            throw new AppException("No categories found for the given IDs", HttpStatus.NO_CONTENT);
         }
 
         return pollRepository.findByCategoryIn(categories).stream()
@@ -174,11 +174,11 @@ public class PollService {
      */
     public List<PollDto> getPollsByOrganizationAndCategories(UUID organizationId, List<UUID> categoryIds) {
         Organization organization = (Organization) userRepository.findById(organizationId)
-                .orElseThrow(() -> new IllegalArgumentException("Organization not found"));
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
         List<Category> categories = categoryRepository.findAllById(categoryIds);
         if (categories.isEmpty()) {
-            throw new IllegalArgumentException("No categories found for the given IDs");
+            throw new AppException("No categories found for the given IDs", HttpStatus.NO_CONTENT);
         }
 
         return pollRepository.findByCreatedByAndCategoryIn(organization, categories).stream()
@@ -191,10 +191,10 @@ public class PollService {
      */
     public void deleteQuestionFromPoll(UUID pollId, UUID questionId) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+                .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
 
         if (!question.getPoll().getId().equals(pollId)) {
-            throw new IllegalArgumentException("Question does not belong to the given poll");
+            throw new AppException("Question does not belong to the given poll", HttpStatus.NOT_FOUND);
         }
 
         questionRepository.deleteById(questionId);
@@ -205,7 +205,7 @@ public class PollService {
      */
     public PollDto addQuestionsToPoll(UUID pollId, List<QuestionDto> questionDtos) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
 
         List<Question> questions = questionDtos.stream()
                 .map(dto -> Question.builder()
@@ -226,7 +226,7 @@ public class PollService {
      */
     public List<QuestionDto> getQuestionsByPollId(UUID pollId) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
 
         return poll.getQuestions().stream()
                 .map(question -> QuestionDto.builder()
@@ -241,7 +241,7 @@ public class PollService {
      */
     public PollDto addBonusesToPoll(UUID pollId, List<UUID> bonusIds) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
 
         List<Bonus> bonuses = bonusRepository.findAllById(bonusIds);
         poll.getBonuses().addAll(bonuses);
@@ -255,13 +255,13 @@ public class PollService {
      */
     public PollDto removeBonusFromPoll(UUID pollId, UUID bonusId) {
         Poll poll = pollRepository.findById(pollId)
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
 
         Bonus bonus = bonusRepository.findById(bonusId)
-                .orElseThrow(() -> new IllegalArgumentException("Bonus not found"));
+                .orElseThrow(() -> new AppException("Bonus not found", HttpStatus.NOT_FOUND));
 
         if (!poll.getBonuses().remove(bonus)) {
-            throw new IllegalArgumentException("Bonus not associated with the given poll");
+            throw new AppException("Bonus not associated with the given poll", HttpStatus.NOT_FOUND);
         }
 
         pollRepository.save(poll);

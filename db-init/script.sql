@@ -139,7 +139,7 @@ ALTER TABLE public.organizations
     ADD COLUMN email character varying(255),
     ADD COLUMN phone character varying(20),
     ADD COLUMN website character varying(255),
-    ADD COLUMN created_at timestamp(6) without time zone NOT NULLl;
+    ADD COLUMN created_at timestamp(6) without time zone NOT NULL  ;
 
 ALTER TABLE public.abstract_users
     ADD COLUMN address character varying(255),

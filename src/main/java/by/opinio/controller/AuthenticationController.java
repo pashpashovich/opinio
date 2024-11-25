@@ -34,18 +34,6 @@ public class AuthenticationController {
         this.service = service;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode()).body(Map.of(
-                "error", ex.getReason()
-        ));
-    }
-
 
     @PostMapping("sign-up-user")
     public ResponseEntity<ApiResponse<AuthenticationResponse>> registerUser(@RequestBody RegisterRequestUser request) {

@@ -1,6 +1,7 @@
 package by.opinio.service;
 
 import by.opinio.ApiResponse;
+import by.opinio.Exception.AppException;
 import by.opinio.domain.AnswerDto;
 import by.opinio.entity.*;
 import by.opinio.repository.AnswerRepository;
@@ -8,6 +9,7 @@ import by.opinio.repository.PollRepository;
 import by.opinio.repository.QuestionRepository;
 import by.opinio.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public class AnswerService {
 
     public List<AnswerDto> getAnswersByQuestion(UUID questionId) {
         Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+                .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
 
         return answerRepository.findByQuestion(question).stream()
                 .map(this::convertToDto)
@@ -36,13 +38,13 @@ public class AnswerService {
     public AnswerDto saveAnswer(AnswerDto answerDto) {
 
         Question question = questionRepository.findById(answerDto.getQuestionId())
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+                .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
         Poll poll = pollRepository.findById(answerDto.getPollId())
-                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
         AbstractUser user = null;
         if (answerDto.getUserId() != null) {
             user = userRepository.findById(answerDto.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
         }
 
         Answer answer = Answer.builder()
