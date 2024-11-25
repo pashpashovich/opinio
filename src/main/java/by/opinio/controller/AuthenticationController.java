@@ -1,6 +1,6 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.auth.AuthenticationRequest;
 import by.opinio.auth.AuthenticationResponse;
 import by.opinio.auth.AuthenticationService;
@@ -12,14 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Map;
 
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")

@@ -1,8 +1,7 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.BonusDto;
-import by.opinio.domain.CategoryDto;
 import by.opinio.domain.LikedOrganizationRequest;
 import by.opinio.domain.OrganizationDto;
 import by.opinio.service.OrganizationService;

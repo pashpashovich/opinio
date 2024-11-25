@@ -1,13 +1,10 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.CreatePostDto;
 import by.opinio.domain.OrganizationPostDto;
-import by.opinio.entity.OrganizationPost;
 import by.opinio.service.OrganizationPostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;

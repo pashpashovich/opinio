@@ -1,6 +1,5 @@
 package by.opinio.service;
 
-import by.opinio.ApiResponse;
 import by.opinio.Exception.AppException;
 import by.opinio.domain.AnswerDto;
 import by.opinio.entity.*;

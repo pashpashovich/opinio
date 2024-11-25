@@ -1,6 +1,6 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.AnswerDto;
 import by.opinio.service.AnswerService;
 import lombok.RequiredArgsConstructor;

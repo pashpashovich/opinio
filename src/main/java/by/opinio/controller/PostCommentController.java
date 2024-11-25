@@ -1,6 +1,6 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.CreateCommentDto;
 import by.opinio.domain.PostCommentDto;
 import by.opinio.service.PostCommentService;

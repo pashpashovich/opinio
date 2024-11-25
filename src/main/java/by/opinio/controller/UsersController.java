@@ -1,6 +1,6 @@
 package by.opinio.controller;
 
-import by.opinio.ApiResponse;
+import by.opinio.API.ApiResponse;
 import by.opinio.entity.User;
 import by.opinio.service.UserService;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package by.opinio;
+package by.opinio.API;
 
 import lombok.*;
 
