@@ -58,6 +58,7 @@ public class Organization extends AbstractUser {
     @ManyToMany(mappedBy = "likedOrganizations")
     private List<User> likedByUsers;
 
-
+    @ManyToMany(mappedBy = "subscriptions")
+    private List<User> subscribers;
 }
 

@@ -30,6 +30,7 @@ public class PollService {
     private final CategoryRepository categoryRepository;
     private final QuestionRepository questionRepository;
     private final BonusRepository bonusRepository;
+    private final SubscriptionService subscriptionService;
 
     /**
      * Создание нового опроса.
@@ -90,6 +91,9 @@ public class PollService {
         // Сохраняем опрос с обновлёнными данными
         poll.setUpdatedAt(LocalDateTime.now());
         pollRepository.save(poll);
+
+        subscriptionService.notifySubscribers(createdBy, "New poll created: " + poll.getTitle());
+
 
         return convertToDto(poll);
     }

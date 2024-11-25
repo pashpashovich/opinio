@@ -247,3 +247,25 @@ VALUES
     (gen_random_uuid(), '{"answer": "Answer3"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 2), '00000000-0000-0000-0000-000000000003', NOW(), NOW(), NOW()),
     (gen_random_uuid(), '{"answer": "Answer4"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 3), '00000000-0000-0000-0000-000000000004', NOW(), NOW(), NOW()),
     (gen_random_uuid(), '{"answer": "Answer5"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 4), '00000000-0000-0000-0000-000000000005', NOW(), NOW(), NOW());
+
+create table if not exists public.notifications
+(
+    id         uuid         not null
+    primary key,
+    created_at timestamp(6) not null,
+    message    varchar(255) not null,
+    read       boolean      not null,
+    user_id    uuid         not null
+    constraint fkcoe55js8ugtxxkbtw52s4axix
+    references public.abstract_users
+    );
+
+create table if not exists public.user_subscriptions
+(
+    user_id         uuid not null
+    constraint fkl80xd7n4cesjmaq438nwshjl3
+    references public.abstract_users,
+    organization_id uuid not null
+    constraint fkrqxv6crgqymcfwgfd2x60fjgo
+    references public.organizations
+);

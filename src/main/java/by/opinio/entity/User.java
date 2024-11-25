@@ -43,4 +43,12 @@ public class User extends AbstractUser {
             inverseJoinColumns = @JoinColumn(name = "organization_id")
     )
     private List<Organization> likedOrganizations;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id")
+    )
+    private List<Organization> subscriptions;
 }
