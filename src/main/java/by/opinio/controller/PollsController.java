@@ -202,5 +202,13 @@ public class PollsController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+    /**
+     * Получение новинок опросов.
+     */
+    @GetMapping("/newPolls")
+    public ResponseEntity<List<PollDto>> getNewPolls() {
+        List<PollDto> newPolls = pollService.getNewPolls();
+        return ResponseEntity.ok(newPolls);
+    }
 
 }

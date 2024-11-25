@@ -17,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,8 +68,6 @@ public class OrganizationService {
                                 .id(poll.getId())
                                 .title(poll.getTitle())
                                 .description(poll.getDescription())
-                                .createdAt(poll.getCreatedAt())
-                                .updatedAt(poll.getUpdatedAt())
                                 .createdBy(organization)
                                 .build())
                         .toList())
@@ -163,6 +162,21 @@ public class OrganizationService {
     public List<CategoryDto> getAllCategories() {
         return categoryRepository.findAll().stream()
                 .map(this::convertCategoryToDto)
+                .toList();
+    }
+    /**
+     * Получение новых организаций.
+     */
+    public List<OrganizationDto> getNewOrganizations() {
+        // Определяем дату 7 дней назад
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        // Находим организации, созданные после указанной даты
+        List<Organization> newOrganizations = organizationRepository.findByCreatedAtAfter(sevenDaysAgo);
+
+        // Конвертируем в DTO
+        return newOrganizations.stream()
+                .map(this::convertToDto)
                 .toList();
     }
 

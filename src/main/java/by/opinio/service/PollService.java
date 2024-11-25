@@ -267,6 +267,21 @@ public class PollService {
         pollRepository.save(poll);
         return convertToDto(poll);
     }
+    /**
+     * Получение новинок опросов.
+     */
+    public List<PollDto> getNewPolls() {
+        // Определяем дату 7 дней назад
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        // Находим опросы, созданные после указанной даты
+        List<Poll> newPolls = pollRepository.findByCreatedAtAfter(sevenDaysAgo);
+
+        // Конвертируем в DTO
+        return newPolls.stream()
+                .map(this::convertToDto)
+                .toList();
+    }
 
     /**
      * Преобразование Poll в DTO.

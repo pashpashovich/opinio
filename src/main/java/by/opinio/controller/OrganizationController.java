@@ -111,5 +111,13 @@ public class OrganizationController {
                 .build();
         return ResponseEntity.ok(response);
     }
+    /**
+     * Получение новых организаций.
+     */
+    @GetMapping("/newOrganizations")
+    public ResponseEntity<List<OrganizationDto>> getNewOrganizations() {
+        List<OrganizationDto> newOrganizations = organizationService.getNewOrganizations();
+        return ResponseEntity.ok(newOrganizations);
+    }
 
 }
