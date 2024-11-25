@@ -15,8 +15,13 @@ import java.util.UUID;
 
 @Repository
 public interface BonusRepository extends JpaRepository<Bonus, UUID> {
+
     List<Bonus> findAllByOrganization(Organization organization);
+
     @Query("SELECT b FROM Bonus b WHERE b.id = :bonusId")
     Bonus findBonusById(@Param("bonusId") UUID bonusId);
-    Optional<Bonus> findByPollId(UUID pollId); // Используем поле poll_id в таблице bonuses
+
+    @Query("SELECT b FROM Bonus b JOIN b.polls p WHERE p.id = :pollId")
+    List<Bonus> findAllByPollId(@Param("pollId") UUID pollId);
+
 }
