@@ -107,7 +107,7 @@ public class OrganizationController {
         organizationService.removeLikedOrganization(userId, request.getOrganizationId());
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .status(true)
-                .message("Organization liked successfully")
+                .message("Organization disliked successfully")
                 .build();
         return ResponseEntity.ok(response);
     }

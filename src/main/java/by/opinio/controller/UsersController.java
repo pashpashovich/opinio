@@ -1,5 +1,6 @@
 package by.opinio.controller;
 
+import by.opinio.ApiResponse;
 import by.opinio.entity.User;
 import by.opinio.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,16 @@ public class UsersController {
         this.userService = userService;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        ApiResponse<List<User>> apiResponse = ApiResponse.<List<User>>builder()
+                .data(users)
+                .status(true)
+                .message("Users fetched successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
+
 
 }
