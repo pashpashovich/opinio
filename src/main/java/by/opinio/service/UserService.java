@@ -1,9 +1,15 @@
 package by.opinio.service;
 
+import by.opinio.Exception.AppException;
+import by.opinio.domain.UserDto;
 import by.opinio.entity.AbstractUser;
+import by.opinio.entity.Category;
+import by.opinio.entity.Organization;
 import by.opinio.entity.User;
+import by.opinio.repository.CategoryRepository;
 import by.opinio.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,11 +20,13 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private  final CategoryRepository categoryRepository;
 
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, CategoryRepository categoryRepository) {
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public boolean isLoginAvailable(String login) {
@@ -53,4 +61,51 @@ public class UserService {
                 .map(AbstractUser::getProfilePictureUrl)
                 .orElse(null);
     }
+    public List<Category> updateInterestedCategories(UUID userId, List<UUID> categoryIds) {
+        // Находим пользователя
+        User user = (User) userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+
+        // Получаем категории по ID
+        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        if (categories.size() != categoryIds.size()) {
+            throw new AppException("Some categories not found", HttpStatus.NOT_FOUND);
+        }
+
+        // Обновляем интересующие категории
+        user.setInterestedCategories(categories);
+
+        // Сохраняем изменения
+        userRepository.save(user);
+
+        return categories;
+    }
+
+    public UserDto getUserById(UUID userId) {
+        User user = (User) userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+        return convertToDto(user);
+    }
+    private UserDto convertToDto(User user) {
+        return UserDto.builder()
+
+                .username(user.getUsername())
+                .activityType(user.getActivityType())
+                .activityName(user.getActivityName())
+                .birthDate(user.getBirthDate())
+                .interestedCategories(
+                        user.getInterestedCategories() != null ?
+                                user.getInterestedCategories().stream()
+                                        .map(Category::getId)
+                                        .toList() : List.of()
+                )
+                .likedOrganizations(
+                        user.getLikedOrganizations() != null ?
+                                user.getLikedOrganizations().stream()
+                                        .map(Organization::getId)
+                                        .toList() : List.of()
+                )
+                .build();
+    }
+
 }
