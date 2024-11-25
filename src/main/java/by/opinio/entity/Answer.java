@@ -25,11 +25,11 @@ public class Answer {
     private LocalDateTime submittedAt = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
+    @JoinColumn(name = "question_id")
     private Question question;
 
     @ManyToOne
-    @JoinColumn(name = "poll_id", nullable = false)
+    @JoinColumn(name = "poll_id")
     private Poll poll;
 
     @ManyToOne

@@ -171,8 +171,8 @@ CREATE TABLE IF NOT EXISTS public.answers (
                                               id uuid PRIMARY KEY NOT NULL,
                                               answer text NOT NULL, -- Ответ на вопрос
                                               submitted_at timestamp(6) without time zone NOT NULL DEFAULT NOW(), -- Дата и время отправки ответа
-    question_id uuid NOT NULL, -- Вопрос, на который дан ответ
-    poll_id uuid NOT NULL, -- Опрос, к которому относится ответ
+    question_id uuid, -- Вопрос, на который дан ответ
+    poll_id uuid, -- Опрос, к которому относится ответ
     user_id uuid, -- Пользователь, который дал ответ (может быть NULL, если анонимный)
     FOREIGN KEY (question_id) REFERENCES public.questions (id) ON DELETE CASCADE,
     FOREIGN KEY (poll_id) REFERENCES public.polls (id) ON DELETE CASCADE,
