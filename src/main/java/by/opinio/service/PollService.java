@@ -330,6 +330,7 @@ public class PollService {
                 .category(categoryDto(poll.getCategory()))
                 .createdBy(convert(poll.getCreatedBy()) )
                 .questions(convert(poll.getQuestions()) )
+                .bonuses(convertBonus(poll.getBonuses()))
                 .build();
     }
 
@@ -354,6 +355,16 @@ public class PollService {
                     .build());
          }
          return questionDtos;
+    }
+    private List<BonusDto> convertBonus(List<Bonus> bonus){
+        List<BonusDto> bonusDtos = new ArrayList<>();
+        for (Bonus bonusDto : bonus) {
+            bonusDtos.add(BonusDto.builder()
+                    .id(bonusDto.getId())
+                            .name(bonusDto.getName())
+                    .build());
+        }
+        return bonusDtos;
     }
 }
 
