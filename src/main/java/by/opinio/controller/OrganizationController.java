@@ -1,5 +1,6 @@
 package by.opinio.controller;
 
+import by.opinio.ApiResponse;
 import by.opinio.domain.CategoryDto;
 import by.opinio.domain.LikedOrganizationRequest;
 import by.opinio.domain.OrganizationDto;
@@ -31,9 +32,14 @@ public class OrganizationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrganizationDto> getOrganizationInfo(@PathVariable UUID id) {
+    public ResponseEntity<ApiResponse<OrganizationDto>> getOrganizationInfo(@PathVariable UUID id) {
         OrganizationDto organizationDto = organizationService.getOrganizationInfo(id);
-        return ResponseEntity.ok(organizationDto);
+        ApiResponse<OrganizationDto> response = ApiResponse.<OrganizationDto>builder()
+                .data(organizationDto)
+                .status(true)
+                .message("Organization taken successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     /*
@@ -41,24 +47,38 @@ public class OrganizationController {
     по категориям
      */
     @GetMapping("/categories")
-    public ResponseEntity<List<OrganizationDto>> getOrganizationsByUserCategories(@RequestParam UUID userId) {
+    public ResponseEntity<ApiResponse<List<OrganizationDto>>> getOrganizationsByUserCategories(@RequestParam UUID userId) {
         List<OrganizationDto> organizations = organizationService.getOrganizationsByUserCategories(userId);
-        return ResponseEntity.ok(organizations);
+        ApiResponse<List<OrganizationDto>> response = ApiResponse.<List<OrganizationDto>>builder()
+                .data(organizations)
+                .status(true)
+                .message("Organization by user categories taken successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
     /*
         Метод для получения организаций,
         которые понравились, если таких нет, ничего не возращаем
     */
     @GetMapping("/liked")
-    public ResponseEntity<List<OrganizationDto>> getLikedOrganizations(@RequestParam UUID userId) {
+    public ResponseEntity<ApiResponse<List<OrganizationDto>>> getLikedOrganizations(@RequestParam UUID userId) {
         List<OrganizationDto> organizations = organizationService.getLikedOrganizations(userId);
-        return ResponseEntity.ok(organizations);
+        ApiResponse<List<OrganizationDto>> response = ApiResponse.<List<OrganizationDto>>builder()
+                .data(organizations)
+                .status(true)
+                .message("Organization by user likes taken successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/liked")
-    public ResponseEntity<Void> addLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
+    public ResponseEntity<ApiResponse<Void>> addLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
         organizationService.addLikedOrganization(userId, request.getOrganizationId());
-        return ResponseEntity.ok().build();
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .status(true)
+                .message("Organization liked successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     /*
@@ -66,19 +86,30 @@ public class OrganizationController {
           по категориям, если пользователь голый, то возращаем категории
     */
     @GetMapping("/interests")
-    public ResponseEntity<?> getOrganizationsByInterests(@RequestParam UUID userId) {
+    public ResponseEntity<ApiResponse<List<OrganizationDto>>> getOrganizationsByInterests(@RequestParam UUID userId) {
         List<OrganizationDto> organizations = organizationService.getOrganizationsByUserInterests(userId);
+        ApiResponse<List<OrganizationDto>> apiResponse = new ApiResponse<>();
         if (organizations.isEmpty()) {
-            List<CategoryDto> categories = organizationService.getAllCategories();
-            return ResponseEntity.ok(categories);
+            List<OrganizationDto> categories = organizationService.getOrganizationsByUserCategories(userId);
+                    apiResponse.setData(categories);
+                    apiResponse.setStatus(true);
+                    apiResponse.setMessage("Organization by user categories taken successfully");
+                    return ResponseEntity.ok(apiResponse);
         }
-        return ResponseEntity.ok(organizations);
+        apiResponse.setData(organizations);
+        apiResponse.setStatus(true);
+        apiResponse.setMessage("Organization by user interests taken successfully");
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/remove-liked")
-    public ResponseEntity<Void> removeLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
+    public ResponseEntity<ApiResponse<Void>> removeLikedOrganization(@RequestParam UUID userId, @RequestBody LikedOrganizationRequest request) {
         organizationService.removeLikedOrganization(userId, request.getOrganizationId());
-        return ResponseEntity.ok().build();
+        ApiResponse<Void> response = ApiResponse.<Void>builder()
+                .status(true)
+                .message("Organization liked successfully")
+                .build();
+        return ResponseEntity.ok(response);
     }
 
 }
