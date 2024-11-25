@@ -118,7 +118,7 @@ public class AuthenticationService {
                     .role(user.getRole().name())
                     .build();
         } catch (AuthenticationException ex) {
-            throw new AppException( "Неверный логин или пароль", HttpStatus.CONFLICT);
+            throw new AppException( "Неверный логин или пароль", HttpStatus.UNAUTHORIZED);
         }
     }
 }
