@@ -21,11 +21,13 @@ public class OrganizationPostService {
 
     private final OrganizationPostRepository organizationPostRepository;
     private final OrganizationRepository organizationRepository;
+    private final SubscriptionService subscriptionService;
 
     public OrganizationPostService(OrganizationPostRepository organizationPostRepository,
-                                   OrganizationRepository organizationRepository) {
+                                   OrganizationRepository organizationRepository, SubscriptionService subscriptionService) {
         this.organizationPostRepository = organizationPostRepository;
         this.organizationRepository = organizationRepository;
+        this.subscriptionService = subscriptionService;
     }
 
     public List<OrganizationPostDto> getPostsByOrganization(UUID organizationId) {
@@ -66,6 +68,7 @@ public class OrganizationPostService {
         post.setOrganization(organization);
 
         organizationPostRepository.save(post);
+        subscriptionService.notifySubscribers(organization, "New post created: " + post.getTitle());
 
         return new OrganizationPostDto(
                 post.getId(),
