@@ -251,6 +251,24 @@ public class PollService {
         return convertToDto(poll);
     }
     /**
+     * Удаление бонуса у опроса.
+     */
+    public PollDto removeBonusFromPoll(UUID pollId, UUID bonusId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
+
+        Bonus bonus = bonusRepository.findById(bonusId)
+                .orElseThrow(() -> new IllegalArgumentException("Bonus not found"));
+
+        if (!poll.getBonuses().remove(bonus)) {
+            throw new IllegalArgumentException("Bonus not associated with the given poll");
+        }
+
+        pollRepository.save(poll);
+        return convertToDto(poll);
+    }
+
+    /**
      * Преобразование Poll в DTO.
      */
     private PollDto convertToDto(Poll poll) {
@@ -273,8 +291,6 @@ public class PollService {
                                 .description(bonus.getDescription())
                                 .build())
                         .toList() : new ArrayList<>())
-                .createdAt(poll.getCreatedAt())
-                .updatedAt(poll.getUpdatedAt())
                 .build();
     }
 

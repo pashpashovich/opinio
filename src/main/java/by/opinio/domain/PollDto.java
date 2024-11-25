@@ -25,7 +25,6 @@ public class PollDto {
     private Organization createdBy;
     private List<QuestionDto> questions;
     private List<BonusDto> bonuses; // Список бонусов
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
 }
 
