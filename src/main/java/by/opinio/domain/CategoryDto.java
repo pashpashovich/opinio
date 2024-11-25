@@ -8,7 +8,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class CategoryDto {
     private UUID id;
     private String name;

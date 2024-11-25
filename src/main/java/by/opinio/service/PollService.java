@@ -1,9 +1,7 @@
 package by.opinio.service;
 
 import by.opinio.Exception.AppException;
-import by.opinio.domain.BonusDto;
-import by.opinio.domain.PollDto;
-import by.opinio.domain.QuestionDto;
+import by.opinio.domain.*;
 import by.opinio.entity.Bonus;
 import by.opinio.entity.Category;
 import by.opinio.entity.Organization;
@@ -37,11 +35,12 @@ public class PollService {
      * Создание нового опроса.
      */
     public PollDto createPoll(PollDto pollDto) {
-        // Получаем организацию, которая создаёт опрос
+
+        // Проверяем существование организации
         Organization createdBy = (Organization) userRepository.findById(pollDto.getCreatedBy().getId())
                 .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
 
-        // Получаем категорию, к которой относится опрос
+        // Проверяем существование категории
         Category category = categoryRepository.findById(pollDto.getCategory().getId())
                 .orElseThrow(() -> new AppException("Category not found", HttpStatus.NOT_FOUND));
 
@@ -51,15 +50,50 @@ public class PollService {
                 .description(pollDto.getDescription())
                 .category(category)
                 .createdBy(createdBy)
-                .questions(new ArrayList<>()) // Инициализируем пустой список вопросов
-                .bonuses(new ArrayList<>()) // Инициализируем пустой список бонусов
+                .questions(new ArrayList<>()) // Пустой список вопросов
+                .bonuses(new ArrayList<>())   // Пустой список бонусов
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
         pollRepository.save(poll);
+
+        // Добавляем вопросы
+        if (pollDto.getQuestions() != null && !pollDto.getQuestions().isEmpty()) {
+            List<Question> questions = new ArrayList<>(); // Изменяемый список
+            pollDto.getQuestions().stream()
+                    .filter(questionDto -> questionDto.getQuestion() != null) // Фильтрация
+                    .forEach(questionDto -> {
+                        Question question = Question.builder()
+                                .question(questionDto.getQuestion())
+                                .poll(poll)
+                                .build();
+                        questions.add(question);
+                    });
+            questionRepository.saveAll(questions);
+            poll.setQuestions(questions);
+        }
+
+        // Добавляем бонусы
+        if (pollDto.getBonuses() != null && !pollDto.getBonuses().isEmpty()) {
+            List<Bonus> bonuses = new ArrayList<>(); // Изменяемый список
+            pollDto.getBonuses().stream()
+                    .filter(bonusDto -> bonusDto.getId() != null) // Фильтрация
+                    .forEach(bonusDto -> {
+                        Bonus bonus = bonusRepository.findById(bonusDto.getId())
+                                .orElseThrow(() -> new AppException("Bonus not found", HttpStatus.NOT_FOUND));
+                        bonuses.add(bonus);
+                    });
+            poll.setBonuses(bonuses);
+        }
+
+        // Сохраняем опрос с обновлёнными данными
+        poll.setUpdatedAt(LocalDateTime.now());
+        pollRepository.save(poll);
+
         return convertToDto(poll);
     }
+
 
     /**
      * Обновление существующего опроса.
@@ -250,6 +284,7 @@ public class PollService {
         pollRepository.save(poll);
         return convertToDto(poll);
     }
+
     /**
      * Удаление бонуса у опроса.
      */
@@ -267,6 +302,7 @@ public class PollService {
         pollRepository.save(poll);
         return convertToDto(poll);
     }
+
     /**
      * Получение новинок опросов.
      */
@@ -291,27 +327,24 @@ public class PollService {
                 .id(poll.getId())
                 .title(poll.getTitle())
                 .description(poll.getDescription())
-                .category(poll.getCategory())
-                .createdBy(poll.getCreatedBy())
-                .questions(poll.getQuestions() != null ? poll.getQuestions().stream()
-                        .map(question -> QuestionDto.builder()
-                                .id(question.getId())
-                                .question(question.getQuestion())
-                                .build())
-                        .toList() : new ArrayList<>())
-                .bonuses(poll.getBonuses() != null ? poll.getBonuses().stream()
-                        .map(bonus -> BonusDto.builder()
-                                .id(bonus.getId())
-                                .name(bonus.getName())
-                                .description(bonus.getDescription())
-                                .build())
-                        .toList() : new ArrayList<>())
+                .category(categoryDto(poll.getCategory()))
+                .createdBy(convert(poll.getCreatedBy()) )
                 .build();
     }
 
-
+    private CategoryDto categoryDto(Category categoryDto){
+        return CategoryDto.builder()
+                .id(categoryDto.getId())
+                .name(categoryDto.getName())
+                .build();
+    }
+    private OrganizationDto convert(Organization organization){
+        return OrganizationDto.builder()
+                .id(organization.getId())
+                .name(organization.getName())
+                .build();
+    }
 }
-
 
 
 

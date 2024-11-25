@@ -7,7 +7,6 @@ import by.opinio.domain.OrganizationDto;
 import by.opinio.domain.PollDto;
 import by.opinio.entity.*;
 import by.opinio.repository.*;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -64,7 +63,7 @@ public class OrganizationService {
                                 .id(poll.getId())
                                 .title(poll.getTitle())
                                 .description(poll.getDescription())
-                                .createdBy(organization)
+                                .createdBy(convert(poll.getCreatedBy()))
                                 .build())
                         .toList())
                 .build();
@@ -216,5 +215,10 @@ public class OrganizationService {
         }
         throw new AppException("Provided ID does not belong to a valid user", HttpStatus.CONFLICT);
     }
-
+    private OrganizationDto convert(Organization organization){
+        return OrganizationDto.builder()
+                .id(organization.getId())
+                .name(organization.getName())
+                .build();
+    }
 }

@@ -21,8 +21,8 @@ public class PollDto {
     private UUID id;
     private String title;
     private String description;
-    private Category category;
-    private Organization createdBy;
+    private CategoryDto category;
+    private OrganizationDto createdBy;
     private List<QuestionDto> questions;
     private List<BonusDto> bonuses; // Список бонусов
 
