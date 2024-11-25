@@ -1,6 +1,7 @@
 package by.opinio.service;
 
 import by.opinio.Exception.AppException;
+import by.opinio.domain.UpdateUserDto;
 import by.opinio.domain.UserDto;
 import by.opinio.entity.AbstractUser;
 import by.opinio.entity.Category;
@@ -10,6 +11,7 @@ import by.opinio.repository.CategoryRepository;
 import by.opinio.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +24,14 @@ public class UserService {
     private final UserRepository userRepository;
     private  final CategoryRepository categoryRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public UserService(UserRepository userRepository, CategoryRepository categoryRepository) {
+    public UserService(UserRepository userRepository, CategoryRepository categoryRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public boolean isLoginAvailable(String login) {
@@ -106,6 +111,38 @@ public class UserService {
                                         .toList() : List.of()
                 )
                 .build();
+    }
+
+    public void updateUser(UUID userId, UpdateUserDto updateUserDto) {
+        // Получаем пользователя из базы данных
+        User user = (User) userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
+
+        // Проверяем новый логин, если он не пустой
+        if (updateUserDto.getUsername() != null && !updateUserDto.getUsername().isBlank()) {
+            user.setUsername(updateUserDto.getUsername());
+        }
+
+        // Проверяем пароли
+        if (updateUserDto.getPassword() != null && !updateUserDto.getPassword().isBlank()) {
+            if (!updateUserDto.getPassword().equals(updateUserDto.getConfirmPassword())) {
+                throw new AppException("Passwords do not match", HttpStatus.BAD_REQUEST);
+            }
+            user.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
+        }
+
+        // Обновляем род деятельности
+        if (updateUserDto.getActivityType() != null) {
+            user.setActivityType(updateUserDto.getActivityType());
+        }
+
+        // Обновляем дату рождения
+        if (updateUserDto.getBirthDate() != null) {
+            user.setBirthDate(updateUserDto.getBirthDate());
+        }
+
+        // Сохраняем изменения
+        userRepository.save(user);
     }
 
 }

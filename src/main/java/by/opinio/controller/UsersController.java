@@ -1,6 +1,7 @@
 package by.opinio.controller;
 
 import by.opinio.API.ApiResponse;
+import by.opinio.domain.UpdateUserDto;
 import by.opinio.domain.UserDto;
 import by.opinio.entity.Category;
 import by.opinio.entity.User;
@@ -73,6 +74,20 @@ public class UsersController {
                 .data(user)
                 .status(true)
                 .message("User fetched successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+    /**
+     * Метод для обновления данных пользователя.
+     */
+    @PostMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> updateUser(
+            @PathVariable UUID userId,
+            @RequestBody UpdateUserDto updateUserDto) {
+        userService.updateUser(userId, updateUserDto);
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .status(true)
+                .message("User updated successfully")
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
