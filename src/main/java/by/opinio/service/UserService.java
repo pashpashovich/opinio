@@ -91,27 +91,8 @@ public class UserService {
                 .orElseThrow(() -> new AppException("User not found", HttpStatus.NOT_FOUND));
         return convertToDto(user);
     }
-    private UserDto convertToDto(User user) {
-        return UserDto.builder()
 
-                .username(user.getUsername())
-                .activityType(user.getActivityType())
-                .activityName(user.getActivityName())
-                .birthDate(user.getBirthDate())
-                .interestedCategories(
-                        user.getInterestedCategories() != null ?
-                                user.getInterestedCategories().stream()
-                                        .map(Category::getId)
-                                        .toList() : List.of()
-                )
-                .likedOrganizations(
-                        user.getLikedOrganizations() != null ?
-                                user.getLikedOrganizations().stream()
-                                        .map(Organization::getId)
-                                        .toList() : List.of()
-                )
-                .build();
-    }
+
 
     public void updateUser(UUID userId, UpdateUserDto updateUserDto) {
         // Получаем пользователя из базы данных
@@ -143,6 +124,24 @@ public class UserService {
 
         // Сохраняем изменения
         userRepository.save(user);
+
+    }
+    private UserDto convertToDto(User user) {
+        return UserDto.builder()
+                .username(user.getUsername())
+                .activityType(user.getActivityType())
+                .activityName(user.getActivityName())
+                .birthDate(user.getBirthDate())
+                .interestedCategories(user.getInterestedCategories().stream()
+                        .map(Category::getId)
+                        .toList())
+                .likedOrganizations(user.getLikedOrganizations().stream()
+                        .map(Organization::getId)
+                        .toList())
+                .subscriptions(user.getSubscriptions().stream()
+                        .map(Organization::getId)
+                        .toList())
+                .build();
     }
 
 }

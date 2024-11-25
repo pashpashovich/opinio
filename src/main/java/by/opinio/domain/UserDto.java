@@ -21,5 +21,6 @@ public class UserDto {
     private String activityName; // Только для USER
     private LocalDate birthDate; // Только для USER
     private List<UUID> interestedCategories; // Список ID категорий
-    private List<UUID> likedOrganizations; // Список ID организаций
+    private List<UUID> likedOrganizations; // Список ID организацийp
+    private List<UUID> subscriptions; // Подписки на организации
 }
