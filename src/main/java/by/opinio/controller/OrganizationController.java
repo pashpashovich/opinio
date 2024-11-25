@@ -4,6 +4,7 @@ import by.opinio.API.ApiResponse;
 import by.opinio.domain.BonusDto;
 import by.opinio.domain.LikedOrganizationRequest;
 import by.opinio.domain.OrganizationDto;
+import by.opinio.domain.PopularOrganizationDto;
 import by.opinio.service.OrganizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -132,6 +133,19 @@ public class OrganizationController {
     public ResponseEntity<List<OrganizationDto>> getNewOrganizations() {
         List<OrganizationDto> newOrganizations = organizationService.getNewOrganizations();
         return ResponseEntity.ok(newOrganizations);
+    }
+    /**
+     * Получение 10 самых популярных организаций.
+     */
+    @GetMapping("/popular")
+    public ResponseEntity<ApiResponse<List<PopularOrganizationDto>>> getTopOrganizations() {
+        List<PopularOrganizationDto> topOrganizations = organizationService.getTopOrganizations();
+        ApiResponse<List<PopularOrganizationDto>> apiResponse = ApiResponse.<List<PopularOrganizationDto>>builder()
+                .data(topOrganizations)
+                .status(true)
+                .message("Top organizations fetched successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 }

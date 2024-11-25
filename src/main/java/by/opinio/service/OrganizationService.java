@@ -5,7 +5,9 @@ import by.opinio.domain.BonusDto;
 import by.opinio.domain.CategoryDto;
 import by.opinio.domain.OrganizationDto;
 import by.opinio.domain.PollDto;
+import by.opinio.domain.PopularOrganizationDto;
 import by.opinio.entity.*;
+import by.opinio.interfeces.PopularOrganizationProjection;
 import by.opinio.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -202,6 +206,23 @@ public class OrganizationService {
                 .build();
     }
 
+    /**
+     * Получение 10 самых популярных организаций.
+     */
+    public List<PopularOrganizationDto> getTopOrganizations() {
+        Pageable pageable = PageRequest.of(0, 10); // Первая страница, 10 записей
+        List<PopularOrganizationProjection> projections = organizationRepository.findTopOrganizationsWithMostSubscribers(pageable);
+
+        // Конвертация в DTO
+        return projections.stream()
+                .map(projection -> PopularOrganizationDto.builder()
+                        .id(projection.getId())
+                        .name(projection.getName())
+                        .subscriberCount(projection.getSubscriberCount())
+                        .build())
+                .toList();
+    }
+
     private CategoryDto convertCategoryToDto(Category category) {
         return CategoryDto.builder()
                 .id(category.getId())
@@ -228,4 +249,6 @@ public class OrganizationService {
                 .name(organization.getName())
                 .build();
     }
+
+
 }
