@@ -329,6 +329,7 @@ public class PollService {
                 .description(poll.getDescription())
                 .category(categoryDto(poll.getCategory()))
                 .createdBy(convert(poll.getCreatedBy()) )
+                .questions(convert(poll.getQuestions()) )
                 .build();
     }
 
@@ -343,6 +344,16 @@ public class PollService {
                 .id(organization.getId())
                 .name(organization.getName())
                 .build();
+    }
+    private List<QuestionDto> convert(List<Question> question){
+         List<QuestionDto> questionDtos = new ArrayList<>();
+         for (Question questionDto : question) {
+            questionDtos.add(QuestionDto.builder()
+                            .id(questionDto.getId())
+                            .question(questionDto.getQuestion())
+                    .build());
+         }
+         return questionDtos;
     }
 }
 
