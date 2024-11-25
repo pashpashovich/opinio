@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -42,6 +43,9 @@ public class Organization extends AbstractUser {
 
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private List<Poll> polls;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToMany
     @JoinTable(

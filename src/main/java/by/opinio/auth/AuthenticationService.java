@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +55,7 @@ public class AuthenticationService {
                 .mission(request.getMission())
                 .description(request.getDescription())
                 .email(request.getEmail())
+                .createdAt(LocalDateTime.now())
                 .phone(request.getPhone())
                 .website(request.getWebsite())
                 .build();
