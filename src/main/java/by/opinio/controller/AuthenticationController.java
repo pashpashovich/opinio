@@ -1,5 +1,6 @@
 package by.opinio.controller;
 
+import by.opinio.ApiResponse;
 import by.opinio.auth.AuthenticationRequest;
 import by.opinio.auth.AuthenticationResponse;
 import by.opinio.auth.AuthenticationService;
@@ -47,22 +48,37 @@ public class AuthenticationController {
 
 
     @PostMapping("sign-up-user")
-    public ResponseEntity<AuthenticationResponse> registerUser(@RequestBody RegisterRequestUser request) {
-        service.register(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> registerUser(@RequestBody RegisterRequestUser request) {
+        AuthenticationResponse authenticationResponse = service.register(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("User registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/sign-up-org")
-    public ResponseEntity<AuthenticationResponse> registerOrg(@RequestBody RegisterRequestOrganization request) {
-        service.register(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> registerOrg(@RequestBody RegisterRequestOrganization request) {
+        AuthenticationResponse authenticationResponse = service.register(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("Organization registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(service.authenticate(request));
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@RequestBody AuthenticationRequest request) {
+        AuthenticationResponse authenticationResponse = service.authenticate(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("Organization registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/logout")
