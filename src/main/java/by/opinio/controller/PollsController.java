@@ -1,8 +1,13 @@
 package by.opinio.controller;
 
 import by.opinio.API.ApiResponse;
+import by.opinio.domain.AddAnswersDTO;
 import by.opinio.domain.PollDto;
 import by.opinio.domain.QuestionDto;
+import by.opinio.entity.Answer;
+import by.opinio.entity.Question;
+import by.opinio.repository.AnswerRepository;
+import by.opinio.repository.QuestionRepository;
 import by.opinio.service.PollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +29,8 @@ import java.util.UUID;
 public class PollsController {
 
     private final PollService pollService;
+    private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
 
     /**
      * Создание нового опроса.
@@ -95,7 +102,28 @@ public class PollsController {
                 .build();
         return ResponseEntity.ok(apiResponse);
     }
+    @PostMapping("/{questionId}/answers")
+    public ResponseEntity<?> addAnswersToQuestion(
+            @PathVariable UUID questionId,
+            @RequestBody AddAnswersDTO addAnswersDTO) {
 
+        // Проверяем существование вопроса
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new RuntimeException("Question not found with ID: " + questionId));
+
+        // Добавляем ответы
+        for (String answerText : addAnswersDTO.getAnswers()) {
+            Answer answer = Answer.builder()
+                    .id(UUID.randomUUID())
+                    .answer(answerText)
+                    .question(question)
+                    .build();
+
+            answerRepository.save(answer);
+        }
+
+        return ResponseEntity.ok("Answers added successfully");
+    }
     /**
      * Удаление вопроса.
      */
