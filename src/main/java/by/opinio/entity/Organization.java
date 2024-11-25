@@ -1,14 +1,11 @@
 package by.opinio.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -17,11 +14,28 @@ import java.util.List;
 @DiscriminatorValue("ORGANIZATION")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 public class Organization extends AbstractUser {
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name",unique = true)
     private String name;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "mission")
+    private String mission;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "website")
+    private String website;
 
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
     private List<Bonus> bonuses;
@@ -29,7 +43,17 @@ public class Organization extends AbstractUser {
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private List<Poll> polls;
 
-    private String description;
+    @ManyToMany
+    @JoinTable(
+            name = "organization_categories",
+            joinColumns = @JoinColumn(name = "organization_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
+
+    @ManyToMany(mappedBy = "likedOrganizations")
+    private List<User> likedByUsers;
+
 
 }
 

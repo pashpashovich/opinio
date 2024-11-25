@@ -12,7 +12,9 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +24,10 @@ import java.util.UUID;
 @Table(name = "bonuses")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Bonus {
-
     @Id
     @GeneratedValue
     private UUID id;
@@ -39,13 +42,9 @@ public class Bonus {
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
 
-    @ManyToMany
-    @JoinTable(
-            name = "bonus_polls",
-            joinColumns = @JoinColumn(name = "bonus_id"),
-            inverseJoinColumns = @JoinColumn(name = "poll_id")
-    )
+    @ManyToMany(mappedBy = "bonuses")
     private List<Poll> polls;
+
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

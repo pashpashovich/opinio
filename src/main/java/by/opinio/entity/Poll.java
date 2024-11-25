@@ -1,17 +1,21 @@
 package by.opinio.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -23,6 +27,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Builder
 public class Poll {
 
@@ -43,14 +48,24 @@ public class Poll {
     @JoinColumn(name = "created_by")
     private Organization createdBy;
 
-    @ManyToMany(mappedBy = "polls")
-    private List<Bonus> bonuses;
+
+    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
+    private List<Question> questions;
+
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @ManyToMany
+    @JoinTable(
+            name = "poll_bonuses",
+            joinColumns = @JoinColumn(name = "poll_id"),
+            inverseJoinColumns = @JoinColumn(name = "bonus_id")
+    )
+    private List<Bonus> bonuses;
 
     @PreUpdate
     public void updateTimestamp() {
