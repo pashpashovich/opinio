@@ -5,13 +5,8 @@ import by.opinio.domain.BonusDto;
 import by.opinio.domain.CategoryDto;
 import by.opinio.domain.OrganizationDto;
 import by.opinio.domain.PollDto;
-import by.opinio.entity.AbstractUser;
-import by.opinio.entity.Category;
-import by.opinio.entity.Organization;
-import by.opinio.entity.User;
-import by.opinio.repository.CategoryRepository;
-import by.opinio.repository.OrganizationRepository;
-import by.opinio.repository.UserRepository;
+import by.opinio.entity.*;
+import by.opinio.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +25,7 @@ public class OrganizationService {
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
     private final CategoryRepository categoryRepository;
+    private final BonusRepository bonusRepository;
 
     public void save(Organization organization) {
         try {
@@ -180,6 +176,15 @@ public class OrganizationService {
                 .toList();
     }
 
+    public List<BonusDto> getOrganizationsBonuses(UUID organizationId){
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new AppException("Organization not found", HttpStatus.NOT_FOUND));
+        List<Bonus> bonuses = bonusRepository.findAllByOrganization(organization);
+        return bonuses.stream()
+                .map(this::convertToBonusesDto)
+                .toList();
+    }
+
     private OrganizationDto convertToDto(Organization organization) {
         return OrganizationDto.builder()
                 .id(organization.getId())
@@ -195,6 +200,13 @@ public class OrganizationService {
         return CategoryDto.builder()
                 .id(category.getId())
                 .name(category.getName())
+                .build();
+    }
+    private BonusDto convertToBonusesDto(Bonus bonus) {
+        return BonusDto.builder()
+                .id(bonus.getId())
+                .name(bonus.getName())
+                .description(bonus.getDescription())
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package by.opinio.controller;
 
 import by.opinio.ApiResponse;
+import by.opinio.domain.BonusDto;
 import by.opinio.domain.CategoryDto;
 import by.opinio.domain.LikedOrganizationRequest;
 import by.opinio.domain.OrganizationDto;
@@ -111,6 +112,20 @@ public class OrganizationController {
                 .build();
         return ResponseEntity.ok(response);
     }
+    /*
+    Метод для получения наград от орги
+     */
+    @GetMapping("/bonuses")
+    public ResponseEntity<ApiResponse<List<BonusDto>>> OrganizationsBonuses(@RequestParam UUID organizationId) {
+        List<BonusDto> bonuses = organizationService.getOrganizationsBonuses(organizationId);
+        ApiResponse<List<BonusDto>> apiResponse = ApiResponse.<List<BonusDto>>builder()
+                .data(bonuses)
+                .status(false)
+                .message("Bonuses taken successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
+
     /**
      * Получение новых организаций.
      */
