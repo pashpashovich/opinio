@@ -1,8 +1,10 @@
 package by.opinio.controller;
 
-import by.opinio.API.ApiResponse;
-import by.opinio.domain.AnswerDto;
+
+import by.opinio.domain.PollResultDTO;
+import by.opinio.domain.PollWithQuestionsDTO;
 import by.opinio.service.AnswerService;
+import by.opinio.service.PollService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,27 +18,18 @@ import java.util.UUID;
 public class AnswerController {
 
     private final AnswerService answerService;
+    private final PollService pollService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<AnswerDto>> saveAnswer(@RequestBody AnswerDto answerDto) {
-        AnswerDto savedAnswer = answerService.saveAnswer(answerDto);
-
-        ApiResponse<AnswerDto> answerDtoApiResponse = ApiResponse.<AnswerDto>builder()
-                .data(savedAnswer)
-                .status(true)
-                .message("Answer saved successfully ")
-                .build();
-        return ResponseEntity.ok(answerDtoApiResponse);
+    @GetMapping("/polls/{pollId}")
+    public ResponseEntity<PollWithQuestionsDTO> getPollDetails(@PathVariable UUID pollId) {
+        PollWithQuestionsDTO poll = pollService.getPollDetails(pollId);
+        return ResponseEntity.ok(poll);
     }
 
-    @GetMapping("/question/{questionId}")
-    public ResponseEntity<ApiResponse<List<AnswerDto>>> getAnswersByQuestion(@PathVariable UUID questionId) {
-        List<AnswerDto> answers = answerService.getAnswersByQuestion(questionId);
-        ApiResponse<List<AnswerDto>> apiResponse = ApiResponse.<List<AnswerDto>>builder()
-                .data(answers)
-                .status(true)
-                .message("Answers returned successfully")
-                .build();
-        return ResponseEntity.ok(apiResponse);
+    @PostMapping("/polls/submit")
+    public ResponseEntity<?> submitPollAnswers(@RequestBody PollResultDTO pollResult) {
+        pollService.submitPollAnswers(pollResult);
+        return ResponseEntity.ok().build();
     }
+
 }

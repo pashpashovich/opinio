@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, UUID> {
     List<Question> findByPoll(Poll poll);
+    List<Question> findByPollId(UUID pollId);
 }

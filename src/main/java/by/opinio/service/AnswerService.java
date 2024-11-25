@@ -1,7 +1,7 @@
 package by.opinio.service;
 
 import by.opinio.Exception.AppException;
-import by.opinio.domain.AnswerDto;
+import by.opinio.domain.AnsweDto;
 import by.opinio.entity.*;
 import by.opinio.repository.AnswerRepository;
 import by.opinio.repository.PollRepository;
@@ -24,7 +24,7 @@ public class AnswerService {
     private final UserRepository userRepository;
     private final AnswerRepository answerRepository;
 
-    public List<AnswerDto> getAnswersByQuestion(UUID questionId) {
+    public List<AnsweDto> getAnswersByQuestion(UUID questionId) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
 
@@ -34,7 +34,7 @@ public class AnswerService {
     }
 
 
-    public AnswerDto saveAnswer(AnswerDto answerDto) {
+    public AnsweDto saveAnswer(AnsweDto answerDto) {
 
         Question question = questionRepository.findById(answerDto.getQuestionId())
                 .orElseThrow(() -> new AppException("Question not found", HttpStatus.NOT_FOUND));
@@ -57,8 +57,8 @@ public class AnswerService {
         answerRepository.save(answer);
         return convertToDto(answer);
     }
-    private AnswerDto convertToDto(Answer answer) {
-        return AnswerDto.builder()
+    private AnsweDto convertToDto(Answer answer) {
+        return AnsweDto.builder()
                 .id(answer.getId())
                 .answer(answer.getAnswer())
                 .questionId(answer.getQuestion().getId())

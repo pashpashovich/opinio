@@ -2,24 +2,19 @@ package by.opinio.service;
 
 import by.opinio.Exception.AppException;
 import by.opinio.domain.*;
-import by.opinio.entity.Bonus;
-import by.opinio.entity.Category;
-import by.opinio.entity.Organization;
-import by.opinio.entity.Poll;
-import by.opinio.entity.Question;
-import by.opinio.repository.BonusRepository;
-import by.opinio.repository.CategoryRepository;
-import by.opinio.repository.PollRepository;
-import by.opinio.repository.QuestionRepository;
-import by.opinio.repository.UserRepository;
+import by.opinio.entity.*;
+import by.opinio.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +26,9 @@ public class PollService {
     private final QuestionRepository questionRepository;
     private final BonusRepository bonusRepository;
     private final SubscriptionService subscriptionService;
+    private final AnswerRepository answerRepository;
+    private final PollResultRepository pollResultRepository;
+    private final BonusAwardRepository bonusAwardRepository;
 
     /**
      * Создание нового опроса.
@@ -97,8 +95,6 @@ public class PollService {
 
         return convertToDto(poll);
     }
-
-
     /**
      * Обновление существующего опроса.
      */
@@ -151,8 +147,6 @@ public class PollService {
         pollRepository.save(poll);
         return convertToDto(poll);
     }
-
-
     /**
      * Удаление опроса по ID.
      */
@@ -162,7 +156,6 @@ public class PollService {
         }
         pollRepository.deleteById(pollId);
     }
-
     /**
      * Получение опроса по ID.
      */
@@ -322,6 +315,56 @@ public class PollService {
                 .map(this::convertToDto)
                 .toList();
     }
+
+    public PollWithQuestionsDTO getPollDetails(UUID pollId) {
+        Poll poll = pollRepository.findById(pollId)
+                .orElseThrow(() -> new AppException("Poll not found", HttpStatus.NOT_FOUND));
+
+        List<QuestionWithAnswersDTO> questions = questionRepository.findByPollId(pollId)
+                .stream()
+                .map(question -> {
+                    List<AnswerDTO> answers = answerRepository.findByQuestionId(question.getId())
+                            .stream()
+                            .map(answer -> new AnswerDTO(answer.getId(), answer.getAnswer()))
+                            .collect(Collectors.toList());
+                    return new QuestionWithAnswersDTO(question.getId(), question.getQuestion(), answers);
+                })
+                .collect(Collectors.toList());
+
+        return new PollWithQuestionsDTO(poll.getId(), poll.getTitle(), poll.getDescription(), questions);
+    }
+
+    @Transactional
+    public void submitPollAnswers(PollResultDTO pollResult) {
+        // Сохранение результатов опроса
+        List<PollResult> pollResults = pollResult.getAnswers().stream()
+                .map(answer -> PollResult.builder()
+                        .id(UUID.randomUUID())
+                        .poll(Poll.builder().id(pollResult.getPollId()).build()) // Создание ссылки на Poll
+                        .user(User.builder().id(pollResult.getUserId()).build()) // Создание ссылки на User
+                        .answer(answer.toJson()) // Преобразование ответа в JSON
+                        .createdAt(LocalDateTime.now())
+                        .submittedAt(LocalDateTime.now())
+                        .build())
+                .toList();
+
+        pollResultRepository.saveAll(pollResults);
+
+        // Присвоение бонуса, если он существует для этого опроса
+        bonusRepository.findByPollId(pollResult.getPollId()).ifPresent(bonus -> {
+            User user = User.builder().id(pollResult.getUserId()).build(); // Ссылка на пользователя
+            BonusAward bonusAward = BonusAward.builder()
+                    .id(UUID.randomUUID())
+                    .user(user) // Передаём сущность User
+                    .bonus(bonus) // Передаём сущность Bonus
+                    .awardedAt(LocalDateTime.now())
+                    .build();
+            bonusAwardRepository.save(bonusAward);
+        });
+
+    }
+
+
 
     /**
      * Преобразование Poll в DTO.

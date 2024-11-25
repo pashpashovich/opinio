@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -17,4 +18,5 @@ public interface BonusRepository extends JpaRepository<Bonus, UUID> {
     List<Bonus> findAllByOrganization(Organization organization);
     @Query("SELECT b FROM Bonus b WHERE b.id = :bonusId")
     Bonus findBonusById(@Param("bonusId") UUID bonusId);
+    Optional<Bonus> findByPollId(UUID pollId); // Используем поле poll_id в таблице bonuses
 }
