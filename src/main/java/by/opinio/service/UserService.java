@@ -40,4 +40,17 @@ public class UserService {
                 .map(abstractUser -> (User)abstractUser)
                 .toList();
     }
+
+    public void uploadAvatar(UUID id, String base64Image) {
+        AbstractUser user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setProfile_picture_url(base64Image);
+        userRepository.save(user);
+    }
+
+    public String getAvatar(UUID id) {
+        return userRepository.findById(id)
+                .map(AbstractUser::getProfile_picture_url)
+                .orElse(null);
+    }
 }

@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,6 +33,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @SuperBuilder
 public abstract class AbstractUser implements UserDetails {
 
@@ -52,6 +54,9 @@ public abstract class AbstractUser implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "activity_type")
     private ActivityType activityType;
+
+    @Column(columnDefinition = "TEXT")
+    private String profile_picture_url;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
