@@ -165,3 +165,23 @@ CREATE TABLE IF NOT EXISTS public.post_comments (
 
 ALTER TABLE public.organization_posts
     ADD COLUMN comment_count integer DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS public.answers (
+                                              id uuid PRIMARY KEY NOT NULL,
+                                              answer text NOT NULL, -- Ответ на вопрос
+                                              submitted_at timestamp(6) without time zone NOT NULL DEFAULT NOW(), -- Дата и время отправки ответа
+    question_id uuid NOT NULL, -- Вопрос, на который дан ответ
+    poll_id uuid NOT NULL, -- Опрос, к которому относится ответ
+    user_id uuid, -- Пользователь, который дал ответ (может быть NULL, если анонимный)
+    FOREIGN KEY (question_id) REFERENCES public.questions (id) ON DELETE CASCADE,
+    FOREIGN KEY (poll_id) REFERENCES public.polls (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES public.abstract_users (id) ON DELETE CASCADE
+    );
+INSERT INTO public.categories (id, name) VALUES
+                                             (gen_random_uuid(), 'Городская инфраструктура'),
+                                             (gen_random_uuid(), 'Здравоохранение'),
+                                             (gen_random_uuid(), 'Образование'),
+                                             (gen_random_uuid(), 'Культура'),
+                                             (gen_random_uuid(), 'Продукт'),
+                                             (gen_random_uuid(), 'Услуги')
+ON CONFLICT DO NOTHING;

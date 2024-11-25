@@ -189,6 +189,20 @@ public class PollService {
     /**
      * Добавление вопросов к опросу.
      */
+    public void deleteQuestionFromPoll(UUID pollId, UUID questionId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+
+        if (!question.getPoll().getId().equals(pollId)) {
+            throw new IllegalArgumentException("Question does not belong to the given poll");
+        }
+
+        questionRepository.deleteById(questionId);
+    }
+
+    /**
+     * Добавление вопросов к опросу.
+     */
     public PollDto addQuestionsToPoll(UUID pollId, List<QuestionDto> questionDtos) {
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
@@ -208,7 +222,7 @@ public class PollService {
     }
 
     /**
-     * Получение вопросов по ID опроса.
+     * Получение вопросов для опроса.
      */
     public List<QuestionDto> getQuestionsByPollId(UUID pollId) {
         Poll poll = pollRepository.findById(pollId)
@@ -236,7 +250,6 @@ public class PollService {
         pollRepository.save(poll);
         return convertToDto(poll);
     }
-
     /**
      * Преобразование Poll в DTO.
      */
