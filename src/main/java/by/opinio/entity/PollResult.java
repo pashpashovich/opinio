@@ -42,12 +42,6 @@ public class PollResult {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @PreUpdate
-    public void updateTimestamp() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }
 

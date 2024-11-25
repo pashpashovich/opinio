@@ -24,4 +24,5 @@ public class Question {
     @ManyToOne
     @JoinColumn(name = "poll_id", nullable = false)
     private Poll poll;
+
 }
