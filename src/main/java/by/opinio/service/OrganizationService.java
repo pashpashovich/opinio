@@ -59,8 +59,6 @@ public class OrganizationService {
                                 .id(bonus.getId())
                                 .name(bonus.getName())
                                 .description(bonus.getDescription())
-                                .createdAt(bonus.getCreatedAt())
-                                .updatedAt(bonus.getUpdatedAt())
                                 .build())
                         .toList())
                 .polls(organization.getPolls().stream()

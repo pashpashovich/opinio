@@ -16,6 +16,4 @@ public class BonusDto {
     private UUID id; // Уникальный идентификатор бонуса
     private String name; // Название бонуса
     private String description; // Описание бонуса
-    private LocalDateTime createdAt; // Время создания бонуса
-    private LocalDateTime updatedAt; // Время последнего обновления бонуса
 }
