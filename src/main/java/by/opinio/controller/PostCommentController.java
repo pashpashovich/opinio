@@ -1,5 +1,6 @@
 package by.opinio.controller;
 
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.CreateCommentDto;
 import by.opinio.domain.PostCommentDto;
 import by.opinio.service.PostCommentService;
@@ -35,20 +36,38 @@ public class PostCommentController {
     }
 
     @GetMapping("/{postId}")
-    public List<PostCommentDto> getCommentsByPost(@PathVariable UUID postId) {
-        return postCommentService.getCommentsByPost(postId);
+    public ResponseEntity<ApiResponse<List<PostCommentDto>>> getCommentsByPost(@PathVariable UUID postId) {
+        List<PostCommentDto> comments = postCommentService.getCommentsByPost(postId);
+        ApiResponse<List<PostCommentDto>> apiResponse = ApiResponse.<List<PostCommentDto>>builder()
+                .data(comments)
+                .status(true)
+                .message("Comments fetched successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     // Добавить комментарий к посту
     @PostMapping
-    public ResponseEntity<PostCommentDto> addComment(@RequestBody CreateCommentDto createCommentDto) {
-        return new ResponseEntity<>(postCommentService.addComment(createCommentDto), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<PostCommentDto>> addComment(@RequestBody CreateCommentDto createCommentDto) {
+        PostCommentDto createdComment = postCommentService.addComment(createCommentDto);
+        ApiResponse<PostCommentDto> apiResponse = ApiResponse.<PostCommentDto>builder()
+                .data(createdComment)
+                .status(true)
+                .message("Comment added successfully")
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable UUID commentId, @RequestParam UUID userId) throws AccessDeniedException {
+    public ResponseEntity<ApiResponse<Void>> deleteComment(@PathVariable UUID commentId, @RequestParam UUID userId) throws AccessDeniedException {
         postCommentService.deleteComment(commentId, userId);
-        return ResponseEntity.ok("Comment successfully deleted");
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .data(null)
+                .status(true)
+                .message("Comment deleted successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
+
 }
 

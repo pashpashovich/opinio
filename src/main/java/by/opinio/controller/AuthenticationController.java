@@ -1,5 +1,6 @@
 package by.opinio.controller;
 
+import by.opinio.API.ApiResponse;
 import by.opinio.auth.AuthenticationRequest;
 import by.opinio.auth.AuthenticationResponse;
 import by.opinio.auth.AuthenticationService;
@@ -11,14 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Map;
 
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -33,36 +30,39 @@ public class AuthenticationController {
         this.service = service;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
-        return ResponseEntity.status(ex.getStatusCode()).body(Map.of(
-                "error", ex.getReason()
-        ));
-    }
-
 
     @PostMapping("sign-up-user")
-    public ResponseEntity<AuthenticationResponse> registerUser(@RequestBody RegisterRequestUser request) {
-        service.register(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> registerUser(@RequestBody RegisterRequestUser request) {
+        AuthenticationResponse authenticationResponse = service.register(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("User registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/sign-up-org")
-    public ResponseEntity<AuthenticationResponse> registerOrg(@RequestBody RegisterRequestOrganization request) {
-        service.register(request);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> registerOrg(@RequestBody RegisterRequestOrganization request) {
+        AuthenticationResponse authenticationResponse = service.register(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("Organization registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(service.authenticate(request));
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@RequestBody AuthenticationRequest request) {
+        AuthenticationResponse authenticationResponse = service.authenticate(request);
+        ApiResponse<AuthenticationResponse> apiResponse =  ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .status(true)
+                .message("Organization registered successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping("/logout")

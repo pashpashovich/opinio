@@ -1,11 +1,10 @@
 package by.opinio.controller;
 
+import by.opinio.API.ApiResponse;
 import by.opinio.domain.CreatePostDto;
 import by.opinio.domain.OrganizationPostDto;
 import by.opinio.service.OrganizationPostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,24 +35,45 @@ public class OrganizationPostController {
     }
 
     @GetMapping("/organization/{organizationId}")
-    public List<OrganizationPostDto> getPostsByOrganization(@PathVariable UUID organizationId) {
-        return organizationPostService.getPostsByOrganization(organizationId);
+    public ResponseEntity<ApiResponse<List<OrganizationPostDto>>> getPostsByOrganization(@PathVariable UUID organizationId) {
+        List<OrganizationPostDto> organizationPosts = organizationPostService.getPostsByOrganization(organizationId);
+        ApiResponse<List<OrganizationPostDto>> apiResponse = ApiResponse.<List<OrganizationPostDto>>builder()
+                .data(organizationPosts)
+                .status(true)
+                .message("Organization posts returned successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @GetMapping("/{postId}")
-    public OrganizationPostDto getPostById(@PathVariable UUID postId) {
-        return organizationPostService.getPostById(postId);
+    public ResponseEntity<ApiResponse<OrganizationPostDto>> getPostById(@PathVariable UUID postId) {
+        OrganizationPostDto organizationPostDtos = organizationPostService.getPostById(postId);
+        ApiResponse<OrganizationPostDto> apiResponse = ApiResponse.<OrganizationPostDto>builder()
+                .data(organizationPostDtos)
+                .status(true)
+                .message("Post by id taken successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @PostMapping
-    public ResponseEntity<OrganizationPostDto> createPost(@RequestBody CreatePostDto createPostDto) {
-        return new ResponseEntity<>(organizationPostService.createPost(createPostDto), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<OrganizationPostDto>> createPost(@RequestBody CreatePostDto createPostDto) {
+        OrganizationPostDto organizationPostDto = organizationPostService.createPost(createPostDto);
+        ApiResponse<OrganizationPostDto> apiResponse = ApiResponse.<OrganizationPostDto>builder()
+                .data(organizationPostDto)
+                .status(true)
+                .message("Post created successfully")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable UUID postId, @RequestParam UUID organizationId) throws AccessDeniedException {
-        organizationPostService.deletePost(postId, organizationId);
-        return ResponseEntity.ok("Post successfully deleted");
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable UUID postId, @RequestParam UUID organizationId) throws AccessDeniedException {
+        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+                .status(true)
+                .message("Post successfully deleted")
+                .build();
+        return ResponseEntity.ok(apiResponse);
     }
 
 }

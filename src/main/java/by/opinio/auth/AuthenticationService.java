@@ -1,6 +1,7 @@
 package by.opinio.auth;
 
 
+import by.opinio.Exception.AppException;
 import by.opinio.config.JwtService;
 import by.opinio.entity.Category;
 import by.opinio.entity.Organization;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +44,7 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegisterRequestOrganization request) {
         if (!userService.isLoginAvailable(request.getLogin())) {
-            throw new IllegalArgumentException("Login already exists: " + request.getLogin());
+            throw new AppException("Login already exists: " + request.getLogin(), HttpStatus.CONFLICT);
         }
 
         Organization organization = Organization.builder()
@@ -54,6 +56,7 @@ public class AuthenticationService {
                 .mission(request.getMission())
                 .description(request.getDescription())
                 .email(request.getEmail())
+                .createdAt(LocalDateTime.now())
                 .phone(request.getPhone())
                 .website(request.getWebsite())
                 .build();
@@ -62,7 +65,7 @@ public class AuthenticationService {
 
         List<Category> categories = new ArrayList<>(Arrays.stream(request.getTags())
                 .map(tag -> categoryRepository.findByName(tag)
-                        .orElseThrow(() -> new IllegalArgumentException("Category not found: " + tag)))
+                        .orElseThrow(() -> new AppException("Category not found: " + tag, HttpStatus.NOT_FOUND)))
                 .toList());
 
         organization.setCategories(categories);
@@ -77,11 +80,11 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequestUser request) {
         if (!userService.isLoginAvailable(request.getLogin())) {
-            throw new IllegalArgumentException("Login already exists: " + request.getLogin());
+            throw new AppException("Login already exists: " + request.getLogin(), HttpStatus.CONFLICT);
         }
         List<Category> categories = Arrays.stream(request.getTags())
                 .map(tag -> categoryRepository.findByName(tag)
-                        .orElseThrow(() -> new IllegalArgumentException("Category not found: " + tag)))
+                        .orElseThrow(() -> new AppException("Category not found: " + tag, HttpStatus.NOT_FOUND)))
                 .toList();
         User user = User.builder()
                 .username(request.getLogin())
@@ -115,7 +118,7 @@ public class AuthenticationService {
                     .role(user.getRole().name())
                     .build();
         } catch (AuthenticationException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Неверный логин или пароль", ex);
+            throw new AppException( "Неверный логин или пароль", HttpStatus.UNAUTHORIZED);
         }
     }
 }

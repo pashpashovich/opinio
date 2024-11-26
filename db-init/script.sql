@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS public.bonuses (
                                               FOREIGN KEY (organization_id) REFERENCES public.organizations (id)
                                                   MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-
+--djghjc
 CREATE UNIQUE INDEX IF NOT EXISTS ukqvqw1rvks6ms13qgd839yeycw ON public.bonuses USING btree (name);
 
 -- Создание таблицы опросов
@@ -138,7 +138,8 @@ ALTER TABLE public.organizations
     ADD COLUMN mission text,
     ADD COLUMN email character varying(255),
     ADD COLUMN phone character varying(20),
-    ADD COLUMN website character varying(255);
+    ADD COLUMN website character varying(255),
+    ADD COLUMN created_at timestamp(6) without time zone NOT NULL  ;
 
 ALTER TABLE public.abstract_users
     ADD COLUMN address character varying(255),
@@ -165,3 +166,109 @@ CREATE TABLE IF NOT EXISTS public.post_comments (
 
 ALTER TABLE public.organization_posts
     ADD COLUMN comment_count integer DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS public.answers (
+                                              id uuid PRIMARY KEY NOT NULL,
+                                              answer text NOT NULL, -- Ответ на вопрос
+                                              submitted_at timestamp(6) without time zone NOT NULL DEFAULT NOW(), -- Дата и время отправки ответа
+    question_id uuid, -- Вопрос, на который дан ответ
+    poll_id uuid, -- Опрос, к которому относится ответ
+    user_id uuid, -- Пользователь, который дал ответ (может быть NULL, если анонимный)
+    FOREIGN KEY (question_id) REFERENCES public.questions (id) ON DELETE CASCADE,
+    FOREIGN KEY (poll_id) REFERENCES public.polls (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES public.abstract_users (id) ON DELETE CASCADE
+    );
+
+create table if not exists public.notifications
+(
+    id         uuid         not null
+        primary key,
+    created_at timestamp(6) not null,
+    message    varchar(255) not null,
+    read       boolean      not null,
+    user_id    uuid         not null
+        constraint fkcoe55js8ugtxxkbtw52s4axix
+            references public.abstract_users
+);
+
+create table if not exists public.user_subscriptions
+(
+    user_id         uuid not null
+        constraint fkl80xd7n4cesjmaq438nwshjl3
+            references public.abstract_users,
+    organization_id uuid not null
+        constraint fkrqxv6crgqymcfwgfd2x60fjgo
+            references public.organizations
+);
+
+CREATE INDEX IF NOT EXISTS idx_answers_question_poll ON public.answers (question_id, poll_id);
+
+-- Активируем расширение pgcrypto (для gen_random_uuid) или uuid-ossp (для uuid_generate_v4)
+-- Активируем расширение pgcrypto для генерации UUID
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Вставка данных в таблицу abstract_users
+INSERT INTO public.abstract_users (id, user_type, activity_type, password, role, username, activity_name, birth_date, address, profile_picture_url)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'USER', 'EDUCATION', 'password1', 'USER', 'user1', 'Activity1', '1990-01-01', 'Address1', 'http://example.com/pic1.jpg'),
+    ('00000000-0000-0000-0000-000000000002', 'USER', 'EDUCATION', 'password2', 'USER', 'user2', 'Activity2', '1991-02-01', 'Address2', 'http://example.com/pic2.jpg'),
+    ('00000000-0000-0000-0000-000000000003', 'USER', 'EDUCATION', 'password3', 'USER', 'user3', 'Activity3', '1992-03-01', 'Address3', 'http://example.com/pic3.jpg'),
+    ('00000000-0000-0000-0000-000000000004', 'USER', 'EDUCATION', 'password4', 'USER', 'user4', 'Activity4', '1993-04-01', 'Address4', 'http://example.com/pic4.jpg'),
+    ('00000000-0000-0000-0000-000000000005', 'USER', 'EDUCATION', 'password5', 'USER', 'user5', 'Activity5', '1994-05-01', 'Address5', 'http://example.com/pic5.jpg');
+
+-- Вставка данных в таблицу categories
+INSERT INTO public.categories (id, name)
+VALUES
+    ('3422b448-2460-4fd2-9183-8000de6f8343', 'Образование'),
+    ('3422b448-2460-4fd2-9183-8000de6f8344', 'Услуги'),
+    ('3422b448-2460-4fd2-9183-8000de6f8345', 'Городская инфраструктура'),
+    ('3422b448-2460-4fd2-9183-8000de6f8346', 'Здравоохранение'),
+    ('3422b448-2460-4fd2-9183-8000de6f8347', 'Культура'),
+    ('3422b448-2460-4fd2-9183-8000de6f8348', 'Продукт');
+
+
+-- Вставка данных в таблицу organizations
+INSERT INTO public.organizations (id, name, description, mission, email, phone, website, created_at)
+VALUES
+    ('00000000-0000-0000-0000-000000000001', 'Organization1', 'Description1', 'Mission1', 'org1@example.com', '123-456-7890', 'http://org1.com', NOW()),
+    ('00000000-0000-0000-0000-000000000002', 'Organization2', 'Description2', 'Mission2', 'org2@example.com', '123-456-7891', 'http://org2.com', NOW()),
+    ('00000000-0000-0000-0000-000000000003', 'Organization3', 'Description3', 'Mission3', 'org3@example.com', '123-456-7892', 'http://org3.com', NOW()),
+    ('00000000-0000-0000-0000-000000000004', 'Organization4', 'Description4', 'Mission4', 'org4@example.com', '123-456-7893', 'http://org4.com', NOW()),
+    ('00000000-0000-0000-0000-000000000005', 'Organization5', 'Description5', 'Mission5', 'org5@example.com', '123-456-7894', 'http://org5.com', NOW());
+
+-- Вставка данных в таблицу bonuses
+INSERT INTO public.bonuses (id, name, description, organization_id, created_at, updated_at)
+VALUES
+    (gen_random_uuid(), 'Bonus1', 'Description1', '00000000-0000-0000-0000-000000000001', NOW(), NOW()),
+    (gen_random_uuid(), 'Bonus2', 'Description2', '00000000-0000-0000-0000-000000000002', NOW(), NOW()),
+    (gen_random_uuid(), 'Bonus3', 'Description3', '00000000-0000-0000-0000-000000000003', NOW(), NOW()),
+    (gen_random_uuid(), 'Bonus4', 'Description4', '00000000-0000-0000-0000-000000000004', NOW(), NOW()),
+    (gen_random_uuid(), 'Bonus5', 'Description5', '00000000-0000-0000-0000-000000000005', NOW(), NOW());
+
+-- Вставка данных в таблицу polls
+INSERT INTO public.polls (id, title, description, category_id, created_by, created_at, updated_at)
+VALUES
+    (gen_random_uuid(), 'Poll1', 'Description1', '3422b448-2460-4fd2-9183-8000de6f8343', '00000000-0000-0000-0000-000000000001', NOW(), NOW()),
+    (gen_random_uuid(), 'Poll2', 'Description2', '3422b448-2460-4fd2-9183-8000de6f8344', '00000000-0000-0000-0000-000000000002', NOW(), NOW()),
+    (gen_random_uuid(), 'Poll3', 'Description3', '3422b448-2460-4fd2-9183-8000de6f8345', '00000000-0000-0000-0000-000000000003', NOW(), NOW()),
+    (gen_random_uuid(), 'Poll4', 'Description4', '3422b448-2460-4fd2-9183-8000de6f8346', '00000000-0000-0000-0000-000000000004', NOW(), NOW()),
+    (gen_random_uuid(), 'Poll5', 'Description5', '3422b448-2460-4fd2-9183-8000de6f8347', '00000000-0000-0000-0000-000000000005', NOW(), NOW());
+
+-- Вставка данных в таблицу questions
+INSERT INTO public.questions (id, question, poll_id)
+VALUES
+    (gen_random_uuid(), 'Question1', (SELECT id FROM public.polls LIMIT 1 OFFSET 0)),
+    (gen_random_uuid(), 'Question2', (SELECT id FROM public.polls LIMIT 1 OFFSET 1)),
+    (gen_random_uuid(), 'Question3', (SELECT id FROM public.polls LIMIT 1 OFFSET 2)),
+    (gen_random_uuid(), 'Question4', (SELECT id FROM public.polls LIMIT 1 OFFSET 3)),
+    (gen_random_uuid(), 'Question5', (SELECT id FROM public.polls LIMIT 1 OFFSET 4));
+
+-- Вставка данных в таблицу poll_results
+INSERT INTO public.poll_results (id, answer, poll_id, user_id, created_at, submitted_at, updated_at)
+VALUES
+    (gen_random_uuid(), '{"answer": "Answer1"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 0), '00000000-0000-0000-0000-000000000001', NOW(), NOW(), NOW()),
+    (gen_random_uuid(), '{"answer": "Answer2"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 1), '00000000-0000-0000-0000-000000000002', NOW(), NOW(), NOW()),
+    (gen_random_uuid(), '{"answer": "Answer3"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 2), '00000000-0000-0000-0000-000000000003', NOW(), NOW(), NOW()),
+    (gen_random_uuid(), '{"answer": "Answer4"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 3), '00000000-0000-0000-0000-000000000004', NOW(), NOW(), NOW()),
+    (gen_random_uuid(), '{"answer": "Answer5"}', (SELECT id FROM public.polls LIMIT 1 OFFSET 4), '00000000-0000-0000-0000-000000000005', NOW(), NOW(), NOW());
+

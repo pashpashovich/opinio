@@ -1,5 +1,6 @@
 package by.opinio.service;
 
+import by.opinio.Exception.AppException;
 import by.opinio.domain.CreateCommentDto;
 import by.opinio.domain.PostCommentDto;
 import by.opinio.entity.AbstractUser;
@@ -9,10 +10,9 @@ import by.opinio.entity.User;
 import by.opinio.repository.OrganizationPostRepository;
 import by.opinio.repository.PostCommentRepository;
 import by.opinio.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -45,10 +45,10 @@ public class PostCommentService {
 
     public PostCommentDto addComment(CreateCommentDto createCommentDto) {
         OrganizationPost post = organizationPostRepository.findById(createCommentDto.getPostId())
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+                .orElseThrow(() -> new AppException("Post not found", HttpStatus.NOT_FOUND));
 
         AbstractUser user = userRepository.findById(createCommentDto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new AppException("User not found" , HttpStatus.NOT_FOUND));
 
         PostComment comment = new PostComment();
         comment.setContent(createCommentDto.getContent());
@@ -77,11 +77,11 @@ public class PostCommentService {
     }
 
 
-    public void deleteComment(UUID commentId, UUID userId) throws AccessDeniedException {
+    public void deleteComment(UUID commentId, UUID userId) {
         PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
+                .orElseThrow(() -> new AppException("Comment not found", HttpStatus.NOT_FOUND));
         if (!comment.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("You do not have permission to delete this comment");
+            throw new AppException("You do not have permission to delete this comment", HttpStatus.CONFLICT);
         }
         OrganizationPost post = comment.getPost();
         post.setCommentCount(post.getCommentCount() - 1);
