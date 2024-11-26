@@ -21,7 +21,7 @@ public class Answer {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String answer;
 
-    @Column(nullable = false)
+    @Column()
     private LocalDateTime submittedAt = LocalDateTime.now();
 
     @ManyToOne

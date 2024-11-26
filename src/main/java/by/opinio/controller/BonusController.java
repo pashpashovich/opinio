@@ -25,15 +25,25 @@ public class BonusController {
     private final OrganizationRepository organizationRepository;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<List<Bonus>>> getBonuses(@PathVariable UUID userId) {
-        List<Bonus> bonuses = bonusService.getBonusesForUser(userId);
-        ApiResponse<List<Bonus>> apiResponse = ApiResponse.<List<Bonus>>builder()
+    public ResponseEntity<ApiResponse<List<BonusDto>>> getBonuses(@PathVariable UUID userId) {
+        List<BonusDto> bonuses = bonusService.getBonusesForUser(userId)
+                .stream()
+                .map(bonus -> BonusDto.builder()
+                        .id(bonus.getId())
+                        .name(bonus.getName())
+                        .description(bonus.getDescription())
+                        .build())
+                .toList();
+
+        ApiResponse<List<BonusDto>> apiResponse = ApiResponse.<List<BonusDto>>builder()
                 .data(bonuses)
                 .status(true)
                 .message("Bonuses for user")
                 .build();
+
         return ResponseEntity.ok(apiResponse);
     }
+
 
     @GetMapping("/info/{bonusId}")
     public ResponseEntity<ApiResponse<BonusDto>> getBonusInfo(@PathVariable UUID bonusId) {
