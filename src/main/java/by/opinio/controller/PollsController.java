@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,15 +108,14 @@ public class PollsController {
             @PathVariable UUID questionId,
             @RequestBody AddAnswersDTO addAnswersDTO) {
 
-        // Проверяем существование вопроса
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found with ID: " + questionId));
 
-        // Добавляем ответы
-        for (String answerText : addAnswersDTO.getAnswers()) {
+        for (int i = 0; i <  addAnswersDTO.getAnswers().size(); i ++) {
             Answer answer = Answer.builder()
                     .id(UUID.randomUUID())
-                    .answer(answerText)
+                    .answer(addAnswersDTO.getAnswers().get(i).getAnswer())
+                    .submittedAt(LocalDateTime.now())
                     .question(question)
                     .build();
 

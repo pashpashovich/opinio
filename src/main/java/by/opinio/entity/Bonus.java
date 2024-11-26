@@ -31,7 +31,7 @@ public class Bonus {
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -48,7 +48,7 @@ public class Bonus {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false)
+    @Column()
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @PreUpdate

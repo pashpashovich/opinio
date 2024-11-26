@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS public.bonuses (
                                               FOREIGN KEY (organization_id) REFERENCES public.organizations (id)
                                                   MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-
+--djghjc
 CREATE UNIQUE INDEX IF NOT EXISTS ukqvqw1rvks6ms13qgd839yeycw ON public.bonuses USING btree (name);
 
 -- Создание таблицы опросов
