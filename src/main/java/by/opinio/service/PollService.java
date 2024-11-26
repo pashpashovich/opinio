@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -338,12 +335,14 @@ public class PollService {
 
     @Transactional
     public void submitPollAnswers(PollResultDTO pollResult) {
-        // Сохраняем результаты ответов пользователя
         for (PollResultAnswerDTO answer : pollResult.getAnswers()) {
+            // Преобразование в JSON объект
             String jsonAnswer;
             try {
-                // Преобразуем ID ответа в JSON
-                jsonAnswer = objectMapper.writeValueAsString(answer.getAnswerId());
+                jsonAnswer = objectMapper.writeValueAsString(Map.of(
+                        "questionId", answer.getQuestionId(),
+                        "answerId", answer.getAnswerId()
+                ));
             } catch (Exception e) {
                 throw new RuntimeException("Error converting answer to JSON", e);
             }
@@ -354,6 +353,8 @@ public class PollService {
                     .user(User.builder().id(pollResult.getUserId()).build()) // Ссылка на пользователя
                     .answer(jsonAnswer) // Ответ в формате JSON
                     .createdAt(LocalDateTime.now())
+                    .submittedAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now()) // Установка значения updatedAt
                     .build();
 
             pollResultRepository.save(pollResultEntity);
@@ -375,7 +376,6 @@ public class PollService {
             bonusAwardRepository.save(bonusAward);
         }
     }
-
 
 
     /**

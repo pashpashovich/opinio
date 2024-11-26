@@ -34,12 +34,13 @@ public class PollResult {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "jsonb")
+    @Column(nullable = false)
     private String answer; // Хранится в JSON формате
 
     private LocalDateTime submittedAt = LocalDateTime.now();
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 
 }
